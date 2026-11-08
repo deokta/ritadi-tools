@@ -165,10 +165,9 @@ async function callGemini(contents, timeoutMs) {
       content: m.parts.map(p => p.text).join("")
     }));
 
-    const input = [
-      { role: "user", content: SYSTEM_PROMPT },
-      ...history
-    ];
+    const input = `${SYSTEM_PROMPT}\n\n${history
+  .map(m => `${m.role}: ${m.content}`)
+  .join("\n\n")}`;
 
     const model = MODEL.replace(/^models\//, "");
 
