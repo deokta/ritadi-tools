@@ -153,55 +153,91 @@ function compact(msgs) {
 }
 
 /* ---------- Gemini REST API ---------- */
+/* ---------- Gemini Interactions API ---------- */
 async function callGemini(contents, timeoutMs) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   const started = Date.now();
-  try {
-    const generationConfig = { maxOutputTokens: MAX_OUTPUT_TOKENS };
-    const thinking = thinkingConfig();
-    if (thinking) generationConfig.thinkingConfig = thinking;
-    if (!/^gemini-3/i.test(MODEL)) generationConfig.temperature = 0.7;
 
-    console.log(`[leguti-ai] request model=${MODEL} ctx=${contents.length}`);
+  try {
+    const history = contents.map(m => ({
+      role: m.role === "model" ? "assistant" : "user",
+      content: m.parts.map(p => p.text).join("")
+    }));
+
+    const input = [
+      { role: "user", content: SYSTEM_PROMPT },
+      ...history
+    ];
+
+    const model = MODEL.replace(/^models\//, "");
+
+    console.log(`[leguti-ai] interactions_start model=${model}`);
+
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(MODEL)}:generateContent`,
+      "https://generativelanguage.googleapis.com/v1beta/interactions",
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-goog-api-key": process.env.GEMINI_API_KEY,
+          "x-goog-api-key": process.env.GEMINI_API_KEY
         },
         body: JSON.stringify({
-          contents,
-          systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-          generationConfig,
+          model: `models/${model}`,
+          input,
+          generation_config: {
+            max_output_tokens: MAX_OUTPUT_TOKENS,
+            thinking_level: "medium"
+          }
         }),
-        signal: controller.signal,
+        signal: controller.signal
       }
     );
 
-    const raw = await response.text();
-    let data;
-    try { data = JSON.parse(raw); }
-    catch { throw Object.assign(new Error("Gemini returned non-JSON response"), { status: response.status }); }
+    const data = await response.json();
 
-    console.log(`[leguti-ai] response model=${MODEL} status=${response.status} ms=${Date.now() - started}`);
+    console.log(
+      `[leguti-ai] interactions_status=${response.status} ms=${Date.now() - started}`
+    );
+
     if (!response.ok) {
-      const error = new Error(data?.error?.message || `Gemini HTTP ${response.status}`);
+      const error = new Error(
+        data?.error?.message || `Gemini HTTP ${response.status}`
+      );
       error.status = response.status;
       throw error;
     }
 
-    const parts = data?.candidates?.[0]?.content?.parts || [];
+    const steps = data.steps || [];
+    const texts = [];
+
+    for (const step of steps) {
+      const output = step.output ?? step.content;
+      if (typeof output === "string") {
+        texts.push(output);
+      } else if (Array.isArray(output)) {
+        for (const part of output) {
+          if (typeof part.text === "string") texts.push(part.text);
+        }
+      } else if (typeof output?.text === "string") {
+        texts.push(output.text);
+      }
+    }
+
+    if (!texts.length && typeof data.output === "string") {
+      texts.push(data.output);
+    }
+
     return {
-      text: parts.filter(p => typeof p.text === "string" && !p.thought).map(p => p.text).join(""),
-      candidates: data?.candidates || [],
-      usageMetadata: data?.usageMetadata,
+      text: texts.join("\n").trim(),
+      candidates: [],
+      usageMetadata: data.usage || {}
     };
   } catch (error) {
-    if (controller.signal.aborted || error?.name === "AbortError") {
-      throw Object.assign(new Error("GEMINI_TIMEOUT"), { code: "TIMEOUT" });
+    if (controller.signal.aborted || error.name === "AbortError") {
+      throw Object.assign(new Error("GEMINI_TIMEOUT"), {
+        code: "TIMEOUT"
+      });
     }
     throw error;
   } finally {
