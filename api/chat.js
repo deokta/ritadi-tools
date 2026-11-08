@@ -160,18 +160,8 @@ async function callGemini(contents, timeoutMs) {
   const started = Date.now();
 
   try {
-    const history = contents.map(m => ({
-      role: m.role === "model" ? "assistant" : "user",
-      content: m.parts.map(p => p.text).join("")
-    }));
-
-    const input = `${SYSTEM_PROMPT}\n\n${history
-  .map(m => `${m.role}: ${m.content}`)
-  .join("\n\n")}`;
-
-    const model = MODEL.replace(/^models\//, "");
-
-    console.log(`[leguti-ai] interactions_start model=${model}`);
+    const lastMessage = contents[contents.length - 1];
+    const question = lastMessage.parts.map(p => p.text).join("");
 
     const response = await fetch(
       "https://generativelanguage.googleapis.com/v1beta/interactions",
@@ -182,12 +172,14 @@ async function callGemini(contents, timeoutMs) {
           "x-goog-api-key": process.env.GEMINI_API_KEY
         },
         body: JSON.stringify({
-          model: `models/${model}`,
-          input,
-          generation_config: {
-            max_output_tokens: MAX_OUTPUT_TOKENS,
-            thinking_level: "medium"
-          }
+          model: MODEL.replace(/^models\//, ""),
+          store: false,
+          input: [
+            {
+              type: "user_input",
+              content: `${SYSTEM_PROMPT}\n\nPertanyaan pengguna: ${question}`
+            }
+          ]
         }),
         signal: controller.signal
       }
@@ -196,7 +188,7 @@ async function callGemini(contents, timeoutMs) {
     const data = await response.json();
 
     console.log(
-      `[leguti-ai] interactions_status=${response.status} ms=${Date.now() - started}`
+      `[leguti-ai] status=${response.status} elapsed=${Date.now() - started}ms`
     );
 
     if (!response.ok) {
@@ -207,28 +199,20 @@ async function callGemini(contents, timeoutMs) {
       throw error;
     }
 
-    const steps = data.steps || [];
-    const texts = [];
+    const reply = (data.steps || [])
+      .filter(step => step.type === "model_output")
+      .flatMap(step => step.content || [])
+      .filter(part => part.type === "text")
+      .map(part => part.text)
+      .join("\n")
+      .trim();
 
-    for (const step of steps) {
-      const output = step.output ?? step.content;
-      if (typeof output === "string") {
-        texts.push(output);
-      } else if (Array.isArray(output)) {
-        for (const part of output) {
-          if (typeof part.text === "string") texts.push(part.text);
-        }
-      } else if (typeof output?.text === "string") {
-        texts.push(output.text);
-      }
-    }
-
-    if (!texts.length && typeof data.output === "string") {
-      texts.push(data.output);
-    }
+    console.log(
+      `[leguti-ai] result=${data.status} replyLength=${reply.length}`
+    );
 
     return {
-      text: texts.join("\n").trim(),
+      text: reply,
       candidates: [],
       usageMetadata: data.usage || {}
     };
