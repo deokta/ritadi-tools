@@ -1,7 +1,6 @@
 // LEGUTI AI — Vercel Serverless Function (Node.js)
 // POST /api/chat  { messages: [{ role: "user" | "model", text: string }, ...] }
 // Auth: header "Authorization: Bearer <Supabase access token>" (akun harus berstatus "approved")
-import { GoogleGenAI } from "@google/genai";
 
 const MODEL = process.env.GEMINI_MODEL || "gemini-3.8-flash";
 const GEMINI_TIMEOUT_MS = Math.max(5000, Number(process.env.GEMINI_TIMEOUT_MS) || 20000); // timeout internal Gemini
@@ -153,30 +152,58 @@ function compact(msgs) {
   return r.map((m) => ({ role: m.role, parts: [{ text: m.text }] }));
 }
 
-/* ---------- Gemini ---------- */
-let client;
-const getClient = () => (client ||= new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY }));
-
+/* ---------- Gemini REST API ---------- */
 async function callGemini(contents, timeoutMs) {
-  const ac = new AbortController();
-  let timer;
-  const deadline = new Promise((_, rej) => {
-    timer = setTimeout(() => {
-      ac.abort();
-      rej(Object.assign(new Error("GEMINI_TIMEOUT"), { code: "TIMEOUT" }));
-    }, timeoutMs);
-  });
-  const config = {
-    systemInstruction: SYSTEM_PROMPT,
-    maxOutputTokens: MAX_OUTPUT_TOKENS,
-    abortSignal: ac.signal,
-    httpOptions: { timeout: timeoutMs },
-  };
-  const tc = thinkingConfig();
-  if (tc) config.thinkingConfig = tc;
-  if (!/^gemini-3/i.test(MODEL)) config.temperature = 0.7; // Gemini 3.x tidak menerima sampling params
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  const started = Date.now();
   try {
-    return await Promise.race([getClient().models.generateContent({ model: MODEL, contents, config }), deadline]);
+    const generationConfig = { maxOutputTokens: MAX_OUTPUT_TOKENS };
+    const thinking = thinkingConfig();
+    if (thinking) generationConfig.thinkingConfig = thinking;
+    if (!/^gemini-3/i.test(MODEL)) generationConfig.temperature = 0.7;
+
+    console.log(`[leguti-ai] request model=${MODEL} ctx=${contents.length}`);
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(MODEL)}:generateContent`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": process.env.GEMINI_API_KEY,
+        },
+        body: JSON.stringify({
+          contents,
+          systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+          generationConfig,
+        }),
+        signal: controller.signal,
+      }
+    );
+
+    const raw = await response.text();
+    let data;
+    try { data = JSON.parse(raw); }
+    catch { throw Object.assign(new Error("Gemini returned non-JSON response"), { status: response.status }); }
+
+    console.log(`[leguti-ai] response model=${MODEL} status=${response.status} ms=${Date.now() - started}`);
+    if (!response.ok) {
+      const error = new Error(data?.error?.message || `Gemini HTTP ${response.status}`);
+      error.status = response.status;
+      throw error;
+    }
+
+    const parts = data?.candidates?.[0]?.content?.parts || [];
+    return {
+      text: parts.filter(p => typeof p.text === "string" && !p.thought).map(p => p.text).join(""),
+      candidates: data?.candidates || [],
+      usageMetadata: data?.usageMetadata,
+    };
+  } catch (error) {
+    if (controller.signal.aborted || error?.name === "AbortError") {
+      throw Object.assign(new Error("GEMINI_TIMEOUT"), { code: "TIMEOUT" });
+    }
+    throw error;
   } finally {
     clearTimeout(timer);
   }
