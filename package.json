@@ -1,10 +1,10 @@
 {
   "name": "jne-leguti-operations-intelligence",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "engines": { "node": ">=20" },
   "dependencies": {
-    "@google/genai": "^1.0.0"
+    "@google/genai": "^1.30.0"
   }
 }
