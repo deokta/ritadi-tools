@@ -161,7 +161,33 @@ async function callGemini(contents, timeoutMs) {
 
   try {
     const lastMessage = contents[contents.length - 1];
-    const question = lastMessage.parts.map(p => p.text).join("");
+    const question = lastMessage.parts
+      .map(part => part.text)
+      .join("");
+
+    const model = MODEL.replace(/^models\//, "");
+
+    const payload = {
+      model: `models/${model}`,
+      store: false,
+      input: [
+        {
+          type: "user_input",
+          content: [
+            {
+              type: "text",
+              text: `${SYSTEM_PROMPT}\n\nPertanyaan pengguna: ${question}`
+            }
+          ]
+        }
+      ],
+      generation_config: {
+        max_output_tokens: 512,
+        thinking_level: "low"
+      }
+    };
+
+    console.log(`[leguti-ai] start model=${model}`);
 
     const response = await fetch(
       "https://generativelanguage.googleapis.com/v1beta/interactions",
@@ -171,24 +197,19 @@ async function callGemini(contents, timeoutMs) {
           "Content-Type": "application/json",
           "x-goog-api-key": process.env.GEMINI_API_KEY
         },
-        body: JSON.stringify({
-          model: MODEL.replace(/^models\//, ""),
-          store: false,
-          input: [
-            {
-              type: "user_input",
-              content: `${SYSTEM_PROMPT}\n\nPertanyaan pengguna: ${question}`
-            }
-          ]
-        }),
+        body: JSON.stringify(payload),
         signal: controller.signal
       }
+    );
+
+    console.log(
+      `[leguti-ai] headers status=${response.status} ms=${Date.now() - started}`
     );
 
     const data = await response.json();
 
     console.log(
-      `[leguti-ai] status=${response.status} elapsed=${Date.now() - started}ms`
+      `[leguti-ai] body ms=${Date.now() - started} status=${data.status || "unknown"}`
     );
 
     if (!response.ok) {
@@ -206,10 +227,6 @@ async function callGemini(contents, timeoutMs) {
       .map(part => part.text)
       .join("\n")
       .trim();
-
-    console.log(
-      `[leguti-ai] result=${data.status} replyLength=${reply.length}`
-    );
 
     return {
       text: reply,
