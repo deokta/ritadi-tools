@@ -224,9 +224,6 @@ const tables = [
   }
 ];
 
-
-  ];
-
   async function readTable(table) {
     const url = new URL(`${base}/rest/v1/${table.name}`);
     url.searchParams.set("select", table.columns);
