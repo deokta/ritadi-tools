@@ -378,3 +378,6 @@
 @media(hover:none){#view-deck .dk-thumb-del{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){#view-deck .dk-thumb-del{transition:none}}
 
+
+/* Hybrid data period controls; scoped to Deck Studio only */
+#view-deck .dk-period-dates{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0}#view-deck .dk-period-dates input,#view-deck #dkPeriod{width:100%;min-width:0;background:#101f3b;color:#e9f4ff;border:1px solid #344e74;border-radius:9px;padding:9px;font:inherit}#view-deck .dk-generate{border-color:#16dccc;color:#12e8d8;font-weight:700;margin:12px 0}@media(max-width:520px){#view-deck .dk-period-dates{grid-template-columns:1fr}}
