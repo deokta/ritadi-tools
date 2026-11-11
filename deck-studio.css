@@ -293,3 +293,24 @@
 #view-deck .dk-preview-slide{width:min(95vw,1150px);aspect-ratio:16/9;position:relative;container-type:inline-size;overflow:hidden;border:1px solid #47648a;border-radius:10px}
 @media(max-width:1250px) and (min-width:901px){#view-deck{grid-template-columns:155px minmax(0,1fr) 255px}#view-deck .dk-action span{display:none}#view-deck .dk-tools .dk-assistant{min-width:110px}}
 @media(max-width:900px){#view-deck{grid-template-columns:1fr;grid-template-rows:none;grid-template-areas:"bar" "stage" "list" "side" "tools";height:auto;min-height:0}#view-deck .dk-bar{flex-wrap:wrap}#view-deck .dk-action span{display:inline}#view-deck .dk-nm{flex-basis:100%}#view-deck .dk-tools{flex-wrap:wrap}#view-deck .dk-lay{grid-template-columns:repeat(3,1fr)}}
+
+/* ===== Deck Studio: desktop canvas alignment fix =====
+   Overrides only the editor layout; other site modules are unaffected. */
+@media (min-width:901px) {
+  #view-deck .dk-stage {
+    justify-content:flex-start;
+    align-items:stretch;
+    gap:10px;
+    overflow-y:auto;
+  }
+  #view-deck .dk-frame {
+    width:100%;
+    max-width:100%;
+    margin:0;
+    flex:0 0 auto;
+  }
+  #view-deck .dk-ctl {
+    margin:0;
+    flex:0 0 auto;
+  }
+}
