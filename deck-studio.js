@@ -341,16 +341,15 @@ const ACT={
   assistant(){st.tab='ai';drawSide()},contenttab(){st.tab='content';drawSide()},
 
   uploadcover(){
-    let input = document.getElementById('dkCoverInput');
-    if (!input) {
-      input = document.createElement('input');
-      input.id = 'dkCoverInput';
-      input.type = 'file';
-      input.accept = 'image/png,image/jpeg';
-      input.hidden = true;
-      document.body.appendChild(input);
-    }
+    const input=q('#dkCoverInput');
+    if(!input){say('Input foto tidak ditemukan. Muat ulang halaman.');return}
+    input.value='';
     input.click();
+  },
+  removecover(){
+    cur().coverImage='';
+    drawStage();drawThumb(st.sel);drawSide();dirty();
+    say('Foto sampul dihapus');
   },
 
    insertkpi(){insertLayout('kpi')},insertchart(){insertLayout('chart')},inserttable(){insertLayout('table')}
@@ -379,6 +378,45 @@ root.addEventListener('click',e=>{
   const f=e.target.closest('#dkFrame [data-f]');
   if(f)focusField(f.dataset.f,f.dataset.k,f.dataset.p);
 });
+/* Foto sampul: proses file, kompres agar aman untuk localStorage, lalu perbarui slide. */
+root.addEventListener('change',async e=>{
+  if(e.target.id!=='dkCoverInput')return;
+  const file=e.target.files&&e.target.files[0];
+  if(!file)return;
+  if(!['image/jpeg','image/png'].includes(file.type)){
+    say('Pilih foto JPG atau PNG');return;
+  }
+  if(file.size>8*1024*1024){say('Ukuran foto maksimal 8 MB');return}
+  const slideId=cur().id;
+  const url=URL.createObjectURL(file);
+  try{
+    const img=new Image();
+    await new Promise((resolve,reject)=>{
+      img.onload=resolve;img.onerror=()=>reject(new Error('Foto tidak dapat dibaca'));
+      img.src=url;
+    });
+    const canvas=document.createElement('canvas');
+    const maxDim=1400,scale=Math.min(1,maxDim/Math.max(img.naturalWidth,img.naturalHeight));
+    canvas.width=Math.max(1,Math.round(img.naturalWidth*scale));
+    canvas.height=Math.max(1,Math.round(img.naturalHeight*scale));
+    const ctx=canvas.getContext('2d');
+    if(!ctx)throw new Error('Canvas tidak tersedia');
+    ctx.drawImage(img,0,0,canvas.width,canvas.height);
+    let data='';
+    for(const quality of [.82,.7,.55,.4]){
+      data=canvas.toDataURL('image/jpeg',quality);
+      if(data.length<1250000)break;
+    }
+    if(data.length>=1250000)throw new Error('Foto terlalu besar untuk disimpan. Coba foto yang lebih kecil.');
+    const target=st.deck.slides.find(s=>s.id===slideId);
+    if(!target)return;
+    target.coverImage=data;
+    drawStage();drawThumb(st.sel);drawSide();dirty();
+    say('Foto sampul berhasil ditambahkan');
+  }catch(err){console.error('[Deck Studio cover]',err);say(err.message||'Gagal memuat foto')}
+  finally{URL.revokeObjectURL(url);e.target.value=''}
+});
+
 root.addEventListener('keydown',e=>{
   if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('#dkFrame [data-f]')){
     e.preventDefault();const f=e.target;focusField(f.dataset.f,f.dataset.k,f.dataset.p);
@@ -434,8 +472,9 @@ async function exportPPTX(){const btn=q('[data-act="export"]');btn.disabled=true
  const tx=(slide,text,x,y,w,h,size=22,opt={})=>{if(!String(text||'').trim())return;slide.addText(String(text),{x,y,w,h,fontFace:'Aptos',fontSize:size,color:fg,margin:0,breakLine:false,fit:'shrink',...opt})};
  st.deck.slides.forEach((s,i)=>{const sl=pptx.addSlide();sl.background={color:bg};sl.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.333,h:.08,line:{color:accent},fill:{color:accent}});
  if(s.layout==='title'||s.layout==='section'){
+  if(s.layout==='title'&&s.coverImage){sl.addImage({data:s.coverImage,x:7.25,y:.10,w:6.08,h:7.0});}
  sl.addShape(pptx.ShapeType.chevron,{x:10.8,y:0,w:2.55,h:7.5,line:{color:accent,transparency:100},fill:{color:accent,transparency:77}});
- tx(sl,'JNE  |  LEGUTI',.8,.45,5,.45,20,{bold:true});tx(sl,s.kicker,.8,2.0,10,.35,15,{bold:true,color:accent,charSpacing:2});tx(sl,s.title,.8,2.5,10.8,1.45,42,{bold:true});tx(sl,s.subtitle,.8,4.45,10,.75,23,{italic:true});tx(sl,s.meta,.8,5.5,8,.5,18);
+ tx(sl,'JNE  |  LEGUTI',.8,.45,5,.45,20,{bold:true});tx(sl,s.kicker,.8,2.0,10,.35,15,{bold:true,color:accent,charSpacing:2});tx(sl,s.title,.8,2.5,s.coverImage&&s.layout==='title'?6.3:10.8,1.45,42,{bold:true});tx(sl,s.subtitle,.8,4.45,s.coverImage&&s.layout==='title'?6.2:10,.75,23,{italic:true});tx(sl,s.meta,.8,5.5,8,.5,18);
  }else{
  tx(sl,s.title,.75,.55,11.8,.75,31,{bold:true});sl.addShape(pptx.ShapeType.line,{x:.75,y:1.45,w:1.3,h:0,line:{color:accent,width:3}});
  if(s.layout==='kpi'){s.k.forEach((k,j)=>{const x=.75+j*3.16;sl.addShape(pptx.ShapeType.roundRect,{x,y:2.45,w:2.9,h:2.0,rectRadius:.15,line:{color:accent,width:1},fill:{color:dark?'11244B':'FFFFFF'}});tx(sl,k.v,x+.2,2.85,2.5,.7,29,{bold:true,color:accent});tx(sl,k.l,x+.2,3.65,2.5,.5,16)});tx(sl,s.subtitle,.8,5.2,11,.65,17)}
