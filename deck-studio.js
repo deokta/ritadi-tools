@@ -584,9 +584,47 @@ async function exportPPTX(){const btn=q('[data-act="export"]');btn.disabled=true
 /* Editor objek manual: model tersimpan bersama slide, tidak mengubah data dashboard. */
 function addObject(data){const o=cleanObject({id:rid(),x:34,y:33,w:25,h:22,color:st.deck.accent,...data});if(!o)return say('Objek tidak valid');const s=cur();s.objects=s.objects||[];if(s.objects.length>=35)return say('Maksimal 35 objek per slide');s.objects.push(o);selectedObject=o.id;st.tab='objects';drawAll();dirty()}
 function showObjectPicker(type){
- const options=type==='shape'?[['rect','Persegi'],['ellipse','Lingkaran'],['line','Garis'],['arrow','Panah']]:Object.keys(DK_ICONS).map(k=>[k,DK_ICONS[k]+' '+k]);
- st.tab='objects';selectedObject=null;drawSide();const sb=q('#dkSb');sb.innerHTML=`<div class="dk-sh">Pilih ${type==='shape'?'Bentuk':'Ikon'}</div><div class="dk-object-picker">${options.map(([k,label])=>`<button type="button" data-kind="${k}">${h(label)}</button>`).join('')}</div><p class="dk-hint">Klik objek pada slide untuk memindahkan, mengubah ukuran, warna, atau menghapusnya.</p>`;
- sb.querySelectorAll('[data-kind]').forEach(b=>b.addEventListener('click',()=>addObject({type,kind:b.dataset.kind,w:type==='icon'?12:25,h:type==='icon'?18:22})));
+ const options = type === 'shape'
+  ? [
+      { key:'rect', icon:'▭', label:'Persegi' },
+      { key:'ellipse', icon:'◯', label:'Lingkaran' },
+      { key:'line', icon:'／', label:'Garis' },
+      { key:'arrow', icon:'➜', label:'Panah' }
+    ]
+  : Object.keys(DK_ICONS).map(k => ({
+      key: k,
+      icon: DK_ICONS[k],
+      label: k.charAt(0).toUpperCase() + k.slice(1)
+    }));
+
+ st.tab='objects';
+ selectedObject=null;
+ drawSide();
+
+ const sb=q('#dkSb');
+ sb.innerHTML=`
+   <div class="dk-sh">Pilih ${type==='shape'?'Bentuk':'Ikon'}</div>
+   <div class="dk-object-picker">
+     ${options.map(o=>`
+       <button type="button" class="dk-object-option" data-kind="${o.key}">
+         <strong>${h(o.icon)}</strong>
+         <span>${h(o.label)}</span>
+       </button>
+     `).join('')}
+   </div>
+   <p class="dk-hint">Klik objek pada slide untuk memindahkan, mengubah ukuran, warna, atau menghapusnya.</p>
+ `;
+
+ sb.querySelectorAll('[data-kind]').forEach(b =>
+   b.addEventListener('click', () =>
+     addObject({
+       type,
+       kind:b.dataset.kind,
+       w:type==='icon'?12:25,
+       h:type==='icon'?18:22
+     })
+   )
+ );
 }
 function drawObjectSide(){const sb=q('#dkSb'),o=(cur().objects||[]).find(x=>x.id===selectedObject);if(!o){sb.innerHTML='<div class="dk-sh">Editor Objek</div><p class="dk-hint">Pilih objek di slide atau gunakan tombol Gambar, Bentuk, Ikon.</p>';return}
  sb.innerHTML=`<div class="dk-sh">Edit ${o.type==='image'?'Gambar':o.type==='shape'?'Bentuk':'Ikon'}</div><p class="dk-hint">Geser objek pada slide. Tarik titik kanan bawah untuk mengubah ukuran.</p>${[['x','Posisi X'],['y','Posisi Y'],['w','Lebar'],['h','Tinggi']].map(([k,label])=>`<label class="dk-fd"><span>${label} (%)</span><input type="number" min="0" max="100" step="1" data-object-prop="${k}" value="${Math.round(o[k])}"></label>`).join('')}${o.type!=='image'?`<label class="dk-fd"><span>Warna</span><input type="color" data-object-prop="color" value="${o.color}"></label>`:''}<button type="button" class="dk-side-btn" data-act="deleteobject">Hapus objek</button>`;
