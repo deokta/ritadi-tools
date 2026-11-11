@@ -313,27 +313,12 @@
     margin:0;
     flex:0 0 auto;
   }
-
-/* Deck Studio: gunakan ruang layar lebih luas */
-@media (min-width: 901px) {
-  body.dk-on .hero {
-    display: none;
-  }
-
-  body.dk-on #view-deck {
-    height: calc(100dvh - 28px);
-    min-height: 560px;
-    margin-top: 0;
-  }
-
-  body.dk-on #view-deck .dk-stage {
-    justify-content: flex-start;
-  }
-
-  body.dk-on #view-deck .dk-frame {
-    margin: 0 auto;
-    width: 100%;
-    max-width: 100%;
-  }
 }
 
+/* Foto sampul pada slide pembuka — hanya Deck Studio */
+.dk-L-title .dk-cover-photo{position:absolute;right:0;top:0;bottom:0;width:54%;background-position:center;background-size:cover;clip-path:polygon(34% 0,100% 0,100% 100%,0 100%);filter:saturate(1.08)}
+.dk-L-title .dk-cover-photo:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,14,35,.35),transparent 65%)}
+.dk-L-title:has(.dk-cover-photo) .dk-shape{width:50%;background:linear-gradient(125deg,rgba(0,235,224,.3),rgba(45,100,245,.16) 55%,transparent)}
+.dk-L-title:has(.dk-cover-photo) .dk-main{width:64%;z-index:2}
+.dk-L-title:has(.dk-cover-photo) .dk-brand{z-index:3}
+.dk-cover-controls{display:grid;gap:7px}
