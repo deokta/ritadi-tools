@@ -73,13 +73,14 @@ const say=t=>{try{typeof toast==='function'&&toast(t)}catch(_){}};
 
 /* ---------- model ---------- */
 const emptySlide=layout=>({
-  id:rid(),layout,kicker:'',title:'',subtitle:'',meta:'',body:'',leftHead:'',left:'',rightHead:'',right:'',insight:'',
+  id:rid(),layout,coverImage:'',kicker:'',title:'',subtitle:'',meta:'',body:'',leftHead:'',left:'',rightHead:'',right:'',insight:'',
   k:[{v:'',l:''},{v:'',l:''},{v:'',l:''},{v:'',l:''}]
 });
 function cleanSlide(o){
   const s=emptySlide(LAYOUTS[o&&o.layout]?o.layout:'content');
   if(!o||typeof o!=='object')return s;
   if(typeof o.id==='string'&&o.id)s.id=o.id.slice(0,24);
+  if(typeof o.coverImage==='string' && /^data:image\/(?:jpeg|png);base64,/.test(o.coverImage) && o.coverImage.length<1400000)s.coverImage=o.coverImage;
   Object.keys(FIELDS).forEach(f=>{s[f]=clip(o[f],FIELDS[f].m)});
   if(Array.isArray(o.k))s.k=s.k.map((_,i)=>({v:clip(o.k[i]&&o.k[i].v,9),l:clip(o.k[i]&&o.k[i].l,40)}));
   return s;
@@ -147,7 +148,7 @@ function slideHTML(s,n,edit){
   let b='';
   switch(s.layout){
     case'title':
-      b=`<div class="dk-shape"></div>${brand}<div class="dk-main">${T('kicker','dk-kick')}${T('title','dk-ti')}<div class="dk-bar2"></div>${T('subtitle','dk-sub')}${T('meta','dk-meta')}</div>`;break;
+      b=`${s.coverImage?`<div class="dk-cover-photo" style="background-image:url('${s.coverImage}')"></div>`:''}<div class="dk-shape"></div>${brand}<div class="dk-main">${T('kicker','dk-kick')}${T('title','dk-ti')}<div class="dk-bar2"></div>${T('subtitle','dk-sub')}${T('meta','dk-meta')}</div>`;break;
     case'twocol':
       b=`<div class="dk-hd">${T('title','dk-ti')}</div><div class="dk-cols">
         <div class="dk-card">${T('leftHead','dk-ch')}${UL('left')}</div>
@@ -218,6 +219,7 @@ function build(){
     ${[['add','＋','Tambah Slide'],['text','T','Teks'],['image','▧','Gambar'],['chart','▥','Grafik'],['table','▦','Tabel'],['shape','⬡','Bentuk'],['icon','☆','Ikon'],['logo','JNE','Logo'],['video','▷','Video']].map(x=>`<button type="button" data-act="${x[0]}" title="${x[2]}"><strong>${x[1]}</strong><span>${x[2]}</span></button>`).join('')}
     <button type="button" class="dk-assistant" data-act="assistant">✦ Joni AI Assistant</button>
   </div>
+  <input id="dkCoverInput" type="file" accept="image/png,image/jpeg" hidden>
   <div class="dk-overlay" id="dkOverlay" hidden></div>`;
 
 }
@@ -263,7 +265,7 @@ function drawSide(){
   if(st.tab==='design'){
     sb.innerHTML=`<div class="dk-sh">Tema Presentasi</div><div class="dk-themes">${Object.entries(THEMES).map(([k,v])=>`<button type="button" class="dk-theme ${k}${st.deck.theme===k?' on':''}" data-act="theme" data-theme="${k}"><i></i><span>${v.name}</span></button>`).join('')}</div><div class="dk-sh">Palet Warna</div><div class="dk-colors">${PALETTE.map(c=>`<button type="button" data-act="color" data-color="${c}" class="${st.deck.accent===c?'on':''}" style="--sw:${c}" aria-label="Warna ${c}"></button>`).join('')}</div>`+ `<div class="dk-sh">Layout slide</div><div class="dk-lay">${Object.keys(LAYOUTS).map(k=>
       `<button type="button" class="dk-lb${k===s.layout?' on':''}" data-act="lay" data-lay="${k}" aria-pressed="${k===s.layout}">${LAYOUTS[k].i}<span>${h(LAYOUTS[k].n)}</span></button>`).join('')}</div>`+
-      `<div class="dk-sh">Latar Belakang</div><div class="dk-backgrounds"><button type="button" data-act="background" data-bg="solid" class="${st.deck.background==='solid'?'on':''}">Solid</button><button type="button" data-act="background" data-bg="gradient" class="${st.deck.background==='gradient'?'on':''}">Gradasi</button></div><p class="dk-hint">Ganti layout tanpa kehilangan isi teks.</p>`;
+      `<div class="dk-sh">Foto Sampul (slide judul)</div><div class="dk-cover-controls"><button type="button" class="dk-side-btn" data-act="uploadcover">＋ Pilih foto gudang / armada</button>${s.coverImage?'<button type="button" class="dk-side-btn" data-act="removecover">Hapus foto sampul</button>':''}</div><p class="dk-hint">JPG/PNG maksimal 8 MB. Foto disimpan dalam draft browser dan ikut ekspor PPTX.</p><div class="dk-sh">Latar Belakang</div><div class="dk-backgrounds"><button type="button" data-act="background" data-bg="solid" class="${st.deck.background==='solid'?'on':''}">Solid</button><button type="button" data-act="background" data-bg="gradient" class="${st.deck.background==='gradient'?'on':''}">Gradasi</button></div><p class="dk-hint">Ganti layout tanpa kehilangan isi teks.</p>`;
     return;
   }
   if(st.tab==='data'){sb.innerHTML=`<div class="dk-sh">Data Operasional</div><p class="dk-hint">Masukkan nilai yang telah diverifikasi pada slide KPI, Grafik, atau Tabel. Sinkronisasi otomatis dengan database belum diaktifkan.</p><button type="button" class="dk-side-btn" data-act="insertkpi">＋ Slide KPI</button><button type="button" class="dk-side-btn" data-act="insertchart">＋ Slide Grafik</button><button type="button" class="dk-side-btn" data-act="inserttable">＋ Slide Tabel</button>`;return}
