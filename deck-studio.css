@@ -1,0 +1,389 @@
+/* ===== LEGUTI Deck Studio =====
+   Modul terpisah. Semua selector memakai awalan #view-deck, .dk-, atau body.dk-on
+   sehingga tidak menimpa gaya modul lain. Memakai variabel warna dari index.html
+   (--bg, --line, --tx, --mu, --b, --p, --c, --o). */
+
+#view-deck[hidden]{display:none}
+#view-deck{
+  display:grid;gap:18px;margin-top:6px;
+  grid-template-columns:208px minmax(0,1fr) 292px;
+  grid-template-rows:auto minmax(0,1fr);
+  grid-template-areas:"bar bar bar" "list stage side";
+  height:calc(100vh - 168px);height:calc(100dvh - 168px);min-height:560px;
+}
+
+/* Header halaman dibuat ringkas saat Deck Studio aktif (hanya desktop) */
+@media(min-width:901px){
+  body.dk-on .hero{height:118px}
+  body.dk-on .art{display:none}
+  body.dk-on .ttl{top:14px}
+  body.dk-on .ttl:before{top:8px;height:64px}
+  body.dk-on h1{font-size:38px}
+  body.dk-on .sub{font-size:16px;margin-top:2px}
+}
+
+/* ---------- panel ---------- */
+.dk-pn{
+  border:1.5px solid var(--line);border-radius:22px;min-height:0;min-width:0;
+  background:linear-gradient(160deg,#0c2260cc,#071337f0 60%);
+  box-shadow:0 0 26px #2f7bff30,inset 0 0 40px #2f7bff12;
+}
+
+/* ---------- bar atas ---------- */
+.dk-bar{grid-area:bar;display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:12px 16px}
+.dk-ic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:23px;color:var(--c);
+  background:#0b1a47;border:1px solid #2b5cc4;flex:none}
+.dk-nm{flex:1 1 260px;min-width:0;display:grid;gap:3px;font-size:12.5px;color:var(--mu)}
+.dk-nm input{height:38px;border-radius:10px;border:1px solid #2b5cc4;background:#071337;padding:0 12px;
+  font-size:17px;font-weight:700;color:#fff;min-width:0;width:100%}
+.dk-sv{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--mu);white-space:nowrap}
+.dk-sv i{width:8px;height:8px;border-radius:50%;background:var(--c);box-shadow:0 0 8px var(--c)}
+.dk-sv.wait i{background:var(--o);box-shadow:0 0 8px var(--o)}
+.dk-sv.err i{background:#f87171;box-shadow:0 0 8px #f87171}
+.dk-bar .nb[disabled]{opacity:.5;cursor:not-allowed;box-shadow:none}
+
+/* ---------- daftar slide ---------- */
+.dk-list{grid-area:list;display:flex;flex-direction:column;padding:14px 12px 12px}
+.dk-lh{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 2px 12px;font-size:16px;font-weight:700}
+.dk-add{width:34px;height:34px;border-radius:10px;border:1px solid #1fe0c4;background:#0b3a5f;color:var(--c);
+  display:grid;place-items:center;font-size:20px;padding:0}
+.dk-add:hover{background:#0f4a78}
+.dk-ths{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding:2px 4px 4px 0;
+  scrollbar-width:thin;scrollbar-color:#3155a2 transparent}
+.dk-tr{display:flex;align-items:flex-start;gap:8px}
+.dk-no{flex:none;width:22px;height:22px;margin-top:2px;border-radius:50%;display:grid;place-items:center;
+  font-size:12px;font-weight:700;background:#14275e;color:#c9d7f6}
+.dk-th{flex:1;min-width:0;padding:0;border:1.5px solid #1b3a82;border-radius:10px;background:none;overflow:hidden;display:block}
+.dk-th:hover{border-color:#3a78e8}
+.dk-th.on{border-color:var(--c);box-shadow:0 0 14px #14e0c455}
+.dk-tr.on .dk-no{background:var(--c);color:#04201c}
+
+/* ---------- area kanvas ---------- */
+.dk-stage{grid-area:stage;container:dkst/inline-size;display:flex;flex-direction:column;gap:12px;padding:16px;overflow:auto;
+  scrollbar-width:thin;scrollbar-color:#3155a2 transparent}
+.dk-frame{
+  position:relative;container-type:inline-size;aspect-ratio:16/9;
+  width:min(100%,max(320px,calc((100vh - 340px) * 1.7778)));
+  width:min(100%,max(320px,calc((100dvh - 340px) * 1.7778)));
+  margin:auto auto 0;border-radius:14px;overflow:hidden;border:1px solid #2b5cc4;
+  box-shadow:0 8px 40px #02071c99,0 0 30px #2f7bff30;background:#030a1c;flex:none;
+}
+.dk-fr{display:block;position:relative;container-type:inline-size;aspect-ratio:16/9;width:100%;overflow:hidden;background:#030a1c}
+.dk-ctl{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin:0 0 auto}
+.dk-cnt{font-size:14px;color:#cfdcf7;min-width:104px;text-align:center}
+.dk-ib{height:40px;min-width:40px;padding:0 12px;border-radius:12px;border:1px solid #2b5cc4;background:#0b1a47;color:#e3ebff;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;font-size:14.5px;font-weight:500}
+.dk-ib .i{font-size:19px}
+.dk-ib:hover:not([disabled]){background:#12307c;border-color:#3a78e8}
+.dk-ib[disabled]{opacity:.38;cursor:not-allowed}
+.dk-ib.dg:hover:not([disabled]){background:#4a1230;border-color:#f87171;color:#ffd5d5}
+.dk-sep{width:1px;height:26px;background:#254aa0;margin:0 4px}
+
+/* ---------- panel kanan ---------- */
+.dk-side{grid-area:side;display:flex;flex-direction:column;overflow:hidden}
+.dk-tabs{display:flex;border-bottom:1px solid #1b3a82;flex:none}
+.dk-tab{flex:1;height:50px;background:none;border:0;border-bottom:2px solid transparent;color:var(--mu);
+  font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px}
+.dk-tab .i{font-size:19px}
+.dk-tab.on{color:var(--c);border-bottom-color:var(--c)}
+.dk-sb{flex:1;min-height:0;overflow-y:auto;padding:16px;scrollbar-width:thin;scrollbar-color:#3155a2 transparent}
+.dk-sh{font-size:15px;font-weight:700;margin-bottom:12px}
+.dk-lay{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.dk-lb{display:grid;justify-items:center;gap:6px;padding:12px 6px 10px;border-radius:12px;border:1px solid #29467f;
+  background:#0a1a4a;color:#cfdcf7;font-size:13px;font-weight:500;line-height:1.25;text-align:center}
+.dk-lb svg{width:54px;height:36px;color:#8fb4ff}
+.dk-lb:hover{border-color:#3a78e8}
+.dk-lb.on{border-color:var(--c);background:#0c2f5a;color:#fff;box-shadow:0 0 14px #14e0c433}
+.dk-lb.on svg{color:var(--c)}
+.dk-hint{margin-top:14px;font-size:13px;line-height:1.55;color:var(--mu)}
+.dk-fd{display:grid;gap:6px;margin-bottom:14px;font-size:13.5px;color:var(--mu)}
+.dk-fd small{font-size:12px;color:#7f95c4}
+.dk-fd input,.dk-fd textarea,.dk-kr input{border-radius:12px;border:1px solid #2b5cc4;background:#071337;color:#fff;
+  padding:0 12px;font-size:15px;min-width:0;width:100%}
+.dk-fd input,.dk-kr input{height:42px}
+.dk-fd textarea{padding:10px 12px;min-height:112px;resize:vertical;line-height:1.5;font-family:inherit}
+.dk-fd input::placeholder,.dk-fd textarea::placeholder,.dk-kr input::placeholder{color:#5f77ad}
+.dk-kg{display:grid;gap:8px;margin-bottom:14px}
+.dk-kr{display:grid;grid-template-columns:96px 1fr;gap:8px}
+.dk-kr b{grid-column:1/-1;font-size:12.5px;font-weight:600;color:var(--mu);margin-top:2px}
+
+#view-deck button:focus-visible,#view-deck input:focus-visible,#view-deck textarea:focus-visible,
+#view-deck [tabindex]:focus-visible{outline:2px solid var(--c);outline-offset:2px}
+#view-deck input:focus,#view-deck textarea:focus{border-color:var(--c)}
+
+/* =====================================================
+   SLIDE (16:9). Semua ukuran memakai cqw = 1% lebar slide,
+   jadi kanvas dan thumbnail memakai kode yang sama.
+   ===================================================== */
+.dk-s{
+  position:absolute;inset:0;overflow:hidden;color:#e8efff;font-family:Inter,system-ui,sans-serif;text-align:left;
+  background:
+    radial-gradient(60cqw 40cqw at 88% -12%,#0d2a78 0,transparent 70%),
+    radial-gradient(50cqw 40cqw at 0 112%,#1b1b78 0,transparent 70%),#030a1c;
+}
+.dk-s *{box-sizing:border-box;margin:0}
+.dk-s [data-f]{overflow-wrap:anywhere}
+.dk-ph{color:#ffffff59!important;font-style:italic}
+.dk-e [data-f]{cursor:text;border-radius:.6cqw;transition:outline-color .15s}
+.dk-e [data-f]:hover{outline:.2cqw dashed #14e0c499;outline-offset:.5cqw}
+.dk-e [data-f]:focus-visible{outline:.25cqw solid #14e0c4;outline-offset:.5cqw}
+
+.dk-brand{position:absolute;left:6cqw;top:4.6cqw;display:flex;align-items:center;gap:1.6cqw}
+.dk-brand .dk-lg{width:9cqw}
+.dk-brand i{width:.14cqw;height:4cqw;background:#ffffff59}
+.dk-brand b{display:block;font-size:2cqw;font-weight:800;letter-spacing:.04em;line-height:1.1}
+.dk-brand span{display:block;font-size:1.25cqw;color:#c6d4f5}
+.dk-lg{display:block;aspect-ratio:126/66;background:var(--dk-logo,none) center/contain no-repeat;mix-blend-mode:screen}
+.dk-foot{position:absolute;left:6cqw;right:6cqw;bottom:2.6cqw;display:flex;align-items:center;justify-content:space-between;
+  font-size:1.25cqw;color:#9fb3d9}
+.dk-foot .dk-lg{width:6.4cqw}
+.dk-bar2{width:6cqw;height:.55cqw;border-radius:1cqw;background:#14e0c4;box-shadow:0 0 1.2cqw #14e0c4}
+
+.dk-hd{position:absolute;left:6cqw;right:6cqw;top:5.2cqw;padding-left:2cqw}
+.dk-hd:before{content:"";position:absolute;left:0;top:.5cqw;bottom:.5cqw;width:.5cqw;border-radius:.3cqw;background:#14e0c4;box-shadow:0 0 1.2cqw #14e0c4}
+.dk-ti{font-size:4.2cqw;font-weight:800;line-height:1.12;letter-spacing:-.01em;text-shadow:0 0 2.4cqw #2f7bff66}
+
+/* Judul & Subjudul */
+.dk-shape{position:absolute;right:0;top:0;bottom:0;width:40cqw;
+  background:linear-gradient(135deg,#14e0c42e,#2f7bff1f 55%,transparent);clip-path:polygon(38% 0,100% 0,100% 100%,0 100%)}
+.dk-shape:after{content:"";position:absolute;inset:0;background:linear-gradient(135deg,#14e0c455,transparent 40%);
+  clip-path:polygon(38% 0,52% 0,14% 100%,0 100%)}
+.dk-L-title .dk-main{position:absolute;left:6cqw;top:15cqw;bottom:5cqw;width:66cqw;display:flex;flex-direction:column;justify-content:center;overflow:hidden}
+.dk-L-title .dk-main>*{flex:none}
+.dk-kick{font-size:1.9cqw;font-weight:700;letter-spacing:.2em;color:#14e0c4;text-transform:uppercase;margin-bottom:1.4cqw}
+.dk-L-title .dk-ti{font-size:5.6cqw;line-height:1.05;letter-spacing:-.015em;margin-bottom:2cqw}
+.dk-L-title .dk-bar2{margin-bottom:2cqw;flex:none}
+.dk-sub{font-size:2.4cqw;line-height:1.35;color:#d0dbf5;font-style:italic}
+.dk-meta{font-size:2.4cqw;font-weight:500;margin-top:1.6cqw}
+
+/* Poin */
+.dk-ul{list-style:none;padding:0}
+.dk-ul li{position:relative;padding-left:2.6cqw}
+.dk-ul li:before{content:"";position:absolute;left:0;top:.95em;width:.9cqw;height:.9cqw;margin-top:-.45cqw;border-radius:50%;background:#14e0c4;box-shadow:0 0 .9cqw #14e0c4}
+.dk-L-content .dk-ul{position:absolute;left:6cqw;right:8cqw;top:19cqw;bottom:8cqw;overflow:hidden;font-size:2.5cqw;line-height:1.4}
+.dk-L-content .dk-ul li{margin-bottom:1.3cqw}
+
+/* Dua Kolom */
+.dk-cols{position:absolute;left:6cqw;right:6cqw;top:19cqw;bottom:8cqw;display:grid;grid-template-columns:1fr 1fr;gap:2.4cqw}
+.dk-card{border:.14cqw solid #1b4ba6;border-radius:1.6cqw;padding:2cqw 2.2cqw;overflow:hidden;
+  background:linear-gradient(160deg,#0c2260cc,#071337f0 60%);box-shadow:0 0 2cqw #2f7bff30,inset 0 0 3cqw #2f7bff12}
+.dk-ch{font-size:2.5cqw;font-weight:700;color:#14e0c4;margin-bottom:1.4cqw}
+.dk-card .dk-ul{font-size:2.1cqw;line-height:1.4}
+.dk-card .dk-ul li{margin-bottom:.9cqw;padding-left:2.2cqw}
+
+/* KPI */
+.dk-kpis{position:absolute;left:6cqw;right:6cqw;top:20cqw;display:grid;grid-template-columns:repeat(4,1fr);gap:2cqw}
+.dk-kpi{position:relative;min-height:19cqw;padding:2.2cqw 1.8cqw;border-radius:1.8cqw;border:.16cqw solid var(--k);
+  background:linear-gradient(135deg,color-mix(in srgb,var(--k) 24%,#07143a),#071337 75%);
+  box-shadow:0 0 2.2cqw color-mix(in srgb,var(--k) 35%,transparent);display:flex;flex-direction:column;justify-content:center;gap:1cqw}
+.dk-kv{font-size:3.4cqw;font-weight:800;letter-spacing:-.01em;line-height:1.1}
+.dk-kl{font-size:1.7cqw;color:#d3def7;line-height:1.3}
+.dk-L-kpi .dk-sub{position:absolute;left:6cqw;right:6cqw;top:44cqw;font-size:2.1cqw}
+
+/* Insight */
+.dk-ins{position:absolute;left:6cqw;right:6cqw;top:19cqw;padding:2.8cqw 3cqw 2.8cqw 4cqw;border-radius:1.8cqw;
+  border:.14cqw solid #4a5cf0;background:linear-gradient(160deg,#0f2a7a,#1c1370 70%,#2a1a9a);font-size:3cqw;font-weight:700;line-height:1.35}
+.dk-ins:before{content:"";position:absolute;left:1.6cqw;top:2.4cqw;bottom:2.4cqw;width:.5cqw;border-radius:.3cqw;background:#14e0c4;box-shadow:0 0 1.2cqw #14e0c4}
+.dk-L-insight .dk-ul{position:absolute;left:6cqw;right:8cqw;top:35cqw;bottom:8cqw;overflow:hidden;font-size:2.2cqw;line-height:1.4}
+.dk-L-insight .dk-ul li{margin-bottom:1cqw}
+
+/* Pembatas Bagian */
+.dk-L-section .dk-main{position:absolute;left:6cqw;right:20cqw;top:14cqw;bottom:8cqw;display:flex;flex-direction:column;justify-content:center;padding-left:3cqw;overflow:hidden}
+.dk-L-section .dk-main>*{flex:none}
+.dk-L-section .dk-main:before{content:"";position:absolute;left:0;top:1cqw;bottom:1cqw;width:.6cqw;border-radius:.3cqw;background:#14e0c4;box-shadow:0 0 1.4cqw #14e0c4}
+.dk-L-section .dk-ti{font-size:6cqw;line-height:1.08;margin-bottom:1.6cqw}
+
+@container dkst (max-width:640px){.dk-ib span{display:none}}
+.dk-lg{border-radius:.4cqw}
+
+/* ---------- responsif ---------- */
+@media(max-width:1180px) and (min-width:901px){
+  #view-deck{grid-template-columns:176px minmax(0,1fr) 248px}
+  .dk-ib span{display:none}
+}
+@media(max-width:900px){
+  #view-deck{grid-template-columns:1fr;grid-template-rows:none;height:auto;min-height:0;gap:14px;
+    grid-template-areas:"bar" "stage" "list" "side"}
+  .dk-bar{padding:12px}
+  .dk-nm{flex-basis:100%}
+  .dk-stage{overflow:visible;padding:12px}
+  .dk-frame{width:100%}
+  .dk-list{padding:12px}
+  .dk-ths{flex-direction:row;overflow-x:auto;overflow-y:hidden;gap:10px;padding:2px 2px 8px}
+  .dk-tr{flex:0 0 150px}
+  .dk-side{overflow:visible}
+  .dk-sb{overflow:visible}
+  .dk-lay{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:520px){
+  .dk-lay{grid-template-columns:repeat(2,1fr)}
+  .dk-ib span{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+  .dk-e [data-f]{transition:none}
+}
+
+/* ===== Deck Studio redesign: reference-inspired, scoped to Deck Studio ===== */
+#view-deck{--dk-accent:#12e8d8;grid-template-columns:200px minmax(0,1fr) 310px;grid-template-rows:auto minmax(0,1fr) auto;grid-template-areas:"bar bar bar" "list stage side" "tools tools tools";gap:12px;height:calc(100dvh - 155px);min-height:660px;margin-top:0}
+#view-deck .dk-pn{border:1px solid #1c3559;border-radius:14px;background:linear-gradient(155deg,#101f3a,#0a172c 70%);box-shadow:none}
+#view-deck .dk-bar{padding:11px 14px;flex-wrap:nowrap;gap:10px;background:#09172d}
+#view-deck .dk-ic{color:var(--dk-accent);border:0;background:none}
+#view-deck .dk-nm{flex:1 1 auto;min-width:130px;gap:2px}
+#view-deck .dk-nm span{font-size:18px;font-weight:800;color:#fff}
+#view-deck .dk-nm input{font-size:12px;font-weight:500;background:transparent;border:0;height:22px;padding:0;color:#9eb1cf}
+#view-deck .dk-ai-tag{display:inline-block;padding:2px 7px;border-radius:5px;background:#854be5;font-size:10px;color:white;vertical-align:middle}
+#view-deck .dk-sv{font-size:11px;max-width:170px;white-space:normal}
+#view-deck .dk-action{border:1px solid #3a5276;border-radius:9px;background:#172b4d;color:#e6eeff;padding:10px 12px;display:flex;align-items:center;gap:6px;white-space:nowrap;font-weight:650}
+#view-deck .dk-action.primary{background:linear-gradient(110deg,#22d8ec,#05e5c8);color:#052037;border-color:transparent}
+#view-deck .dk-action:disabled{opacity:.5}
+#view-deck .dk-list{padding:12px 9px}
+#view-deck .dk-stage{padding:13px;justify-content:center;background:linear-gradient(155deg,#142440,#0a172c)}
+#view-deck .dk-frame{width:100%;max-width:100%;border:1px solid #2b456d;border-radius:10px;margin:auto 0 0;box-shadow:0 14px 38px #0005}
+#view-deck .dk-ctl{justify-content:flex-start;margin:0;gap:7px;font-size:12px}
+#view-deck .dk-ib{min-width:30px;height:33px;border-radius:8px;padding:0 9px}
+#view-deck .dk-ctl-spacer{flex:1}
+#view-deck .dk-ratio{border:1px solid #304666;padding:5px 8px;border-radius:7px;color:#bac9e4}
+#view-deck .dk-tabs{height:65px}
+#view-deck .dk-tab{flex-direction:column;gap:2px;font-size:12px;height:65px}
+#view-deck .dk-tab.on{color:var(--dk-accent);border-bottom-color:var(--dk-accent)}
+#view-deck .dk-sb{padding:14px}
+#view-deck .dk-sh{margin-top:15px;font-size:13px}
+#view-deck .dk-sh:first-child{margin-top:0}
+#view-deck .dk-themes{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+#view-deck .dk-theme{border:1px solid #344b73;border-radius:8px;background:transparent;color:#b9c9e3;padding:4px;display:grid;gap:6px;font-size:11px;text-align:center}
+#view-deck .dk-theme i{display:block;height:52px;border-radius:6px;background:radial-gradient(ellipse at 80% 90%,#14e0c4,#0c2658 55%,#040b1a)}
+#view-deck .dk-theme.arctic i{background:linear-gradient(135deg,#fff,#bcdafa 55%,#8fb8eb)}
+#view-deck .dk-theme.aurora i{background:radial-gradient(ellipse at 70% 80%,#bd48e9,#422077 65%,#160f3b)}
+#view-deck .dk-theme.on,#view-deck .dk-backgrounds .on{border-color:var(--dk-accent)}
+#view-deck .dk-colors{display:flex;gap:8px;flex-wrap:wrap}
+#view-deck .dk-colors button{width:27px;height:27px;border:2px solid transparent;border-radius:50%;background:var(--sw)}
+#view-deck .dk-colors button.on{outline:2px solid var(--dk-accent);outline-offset:2px}
+#view-deck .dk-lay{grid-template-columns:repeat(3,1fr);gap:7px}
+#view-deck .dk-lb{padding:8px 3px;font-size:10px;min-height:67px}
+#view-deck .dk-lb svg{width:35px;height:25px}
+#view-deck .dk-lb.on{border-color:var(--dk-accent)}
+#view-deck .dk-backgrounds{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#view-deck .dk-backgrounds button,#view-deck .dk-side-btn{border:1px solid #355077;border-radius:9px;background:#122b50;color:#e4f2ff;padding:12px}
+#view-deck .dk-side-btn{width:100%;margin:5px 0;text-align:left}
+#view-deck .dk-tools{grid-area:tools;display:flex;align-items:stretch;gap:5px;padding:7px 10px;min-height:70px;overflow-x:auto}
+#view-deck .dk-tools button{min-width:60px;flex:1;border:0;border-radius:8px;background:transparent;color:#d4e2f8;display:grid;place-items:center;gap:4px;padding:6px;font-size:11px}
+#view-deck .dk-tools button:hover{background:#18365b}
+#view-deck .dk-tools strong{font-size:23px;font-weight:500;line-height:1.2}
+#view-deck .dk-tools button:first-child{border:1px solid var(--dk-accent);color:var(--dk-accent);min-width:90px}
+#view-deck .dk-tools .dk-assistant{min-width:170px;flex:1.4;background:linear-gradient(110deg,#37266c,#6236a1);font-size:13px;font-weight:750}
+#view-deck .dk-s{--dk-slide-accent:var(--dk-accent,#12e8d8)}
+#view-deck .dk-s .dk-kick,#view-deck .dk-s .dk-ch{color:var(--dk-slide-accent)}
+#view-deck .dk-s .dk-bar2,#view-deck .dk-s .dk-hd:before,#view-deck .dk-s .dk-ul li:before{background:var(--dk-slide-accent)}
+#view-deck .dk-frame[data-theme="arctic"] .dk-s{background:linear-gradient(140deg,#fff,#d7e9fb);color:#142b4e}
+#view-deck .dk-frame[data-theme="arctic"] .dk-sub,#view-deck .dk-frame[data-theme="arctic"] .dk-meta{color:#3a5677}
+#view-deck .dk-frame[data-theme="aurora"] .dk-s{background:radial-gradient(60cqw 50cqw at 100% 100%,#7a1ca4,#1b114b 65%,#0a102c)}
+#view-deck .dk-frame[data-background="gradient"] .dk-s{background-image:linear-gradient(125deg,#061126,#0b4061 60%,#143174)}
+#view-deck .dk-chart{position:absolute;left:8cqw;right:8cqw;top:17cqw;display:grid;gap:2.2cqw}
+#view-deck .dk-chart-row{display:grid;grid-template-columns:15cqw 1fr 9cqw;align-items:center;gap:2cqw;font-size:2cqw}
+#view-deck .dk-chart-row div{height:2.5cqw;border-radius:.7cqw;background:#162c53;overflow:hidden}
+#view-deck .dk-chart-row i{display:block;height:100%;background:var(--dk-slide-accent);border-radius:.7cqw}
+#view-deck .dk-table{position:absolute;left:6cqw;right:6cqw;top:17cqw;display:grid;gap:.6cqw}
+#view-deck .dk-table-row{display:flex;gap:.5cqw;font-size:2cqw}
+#view-deck .dk-table-row span{flex:1;padding:1.2cqw;border:.1cqw solid #355179;background:#102143}
+#view-deck .dk-table-row.heading span{background:#147a83;font-weight:700}
+#view-deck .dk-overlay[hidden]{display:none}
+#view-deck .dk-overlay{position:fixed;inset:0;z-index:99999;background:#030914ed;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:15px;padding:20px}
+#view-deck .dk-preview-top,#view-deck .dk-preview-bottom{display:flex;align-items:center;justify-content:space-between;gap:18px;width:min(95vw,1150px);color:#fff}
+#view-deck .dk-preview-top button,#view-deck .dk-preview-bottom button{background:#163054;color:white;border:1px solid #3c5278;padding:10px 15px;border-radius:8px}
+#view-deck .dk-preview-slide{width:min(95vw,1150px);aspect-ratio:16/9;position:relative;container-type:inline-size;overflow:hidden;border:1px solid #47648a;border-radius:10px}
+@media(max-width:1250px) and (min-width:901px){#view-deck{grid-template-columns:155px minmax(0,1fr) 255px}#view-deck .dk-action span{display:none}#view-deck .dk-tools .dk-assistant{min-width:110px}}
+@media(max-width:900px){#view-deck{grid-template-columns:1fr;grid-template-rows:none;grid-template-areas:"bar" "stage" "list" "side" "tools";height:auto;min-height:0}#view-deck .dk-bar{flex-wrap:wrap}#view-deck .dk-action span{display:inline}#view-deck .dk-nm{flex-basis:100%}#view-deck .dk-tools{flex-wrap:wrap}#view-deck .dk-lay{grid-template-columns:repeat(3,1fr)}}
+
+/* ===== Deck Studio: desktop canvas alignment fix =====
+   Overrides only the editor layout; other site modules are unaffected. */
+@media (min-width:901px) {
+  #view-deck .dk-stage {
+    justify-content:flex-start;
+    align-items:stretch;
+    gap:10px;
+    overflow-y:auto;
+  }
+  #view-deck .dk-frame {
+    width:100%;
+    max-width:100%;
+    margin:0;
+    flex:0 0 auto;
+  }
+  #view-deck .dk-ctl {
+    margin:0;
+    flex:0 0 auto;
+  }
+}
+
+/* Foto sampul pada slide pembuka — hanya Deck Studio */
+.dk-L-title .dk-cover-photo{position:absolute;right:0;top:0;bottom:0;width:54%;background-position:center;background-size:cover;clip-path:polygon(34% 0,100% 0,100% 100%,0 100%);filter:saturate(1.08)}
+.dk-L-title .dk-cover-photo:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,14,35,.35),transparent 65%)}
+.dk-L-title:has(.dk-cover-photo) .dk-shape{width:50%;background:linear-gradient(125deg,rgba(0,235,224,.3),rgba(45,100,245,.16) 55%,transparent)}
+.dk-L-title:has(.dk-cover-photo) .dk-main{width:64%;z-index:2}
+.dk-L-title:has(.dk-cover-photo) .dk-brand{z-index:3}
+.dk-cover-controls{display:grid;gap:7px}
+
+
+/* Deck Studio: gunakan ruang layar lebih luas */
+@media (min-width: 901px) {
+  body.dk-on .hero {
+    display: none;
+  }
+
+  body.dk-on #view-deck {
+    height: calc(100dvh - 28px);
+    min-height: 560px;
+    margin-top: 0;
+  }
+
+  body.dk-on #view-deck .dk-stage {
+    justify-content: flex-start;
+  }
+
+  body.dk-on #view-deck .dk-frame {
+    margin: 0 auto;
+    width: 100%;
+    max-width: 100%;
+  }
+}
+/* LEGUTI Deck Studio — visual upgrade based on user's reference. Additive only. */
+#view-deck .dk-tr{position:relative}
+#view-deck .dk-thumb-del{position:absolute;right:5px;top:5px;width:27px;height:27px;display:flex;align-items:center;justify-content:center;background:#132848ee;color:#f6bdc5;border:1px solid #af5368;border-radius:7px;cursor:pointer;opacity:0;transform:translateY(-2px);transition:opacity .18s,transform .18s;z-index:4}
+#view-deck .dk-thumb-del svg{width:15px;height:15px}
+#view-deck .dk-tr:hover .dk-thumb-del,#view-deck .dk-thumb-del:focus-visible{opacity:1;transform:translateY(0)}
+#view-deck .dk-thumb-del:hover{background:#9e2943;color:#fff}
+#view-deck .dk-joni-mark{width:22px;height:22px;display:inline-block;vertical-align:middle;flex-shrink:0}
+#view-deck .dk-assistant{display:flex;align-items:center;justify-content:center;gap:8px}
+#view-deck .dk-assistant .dk-joni-mark{width:29px;height:29px}
+#view-deck .dk-joni-heading{display:flex;align-items:center;gap:9px;margin:5px 0 14px;color:#e6ecff}
+#view-deck .dk-joni-heading .dk-joni-mark{width:36px;height:36px}
+#view-deck .dk-tab .dk-joni-mark{width:22px;height:22px}
+/* Template 1: editorial cover with angled image (existing photo handling unchanged). */
+#view-deck .dk-template-1.dk-L-title .dk-kick{letter-spacing:.18em}
+#view-deck .dk-template-1.dk-L-title .dk-ti{font-weight:850;letter-spacing:-.035em}
+/* Template 2: executive summary, four concise highlights */
+#view-deck .dk-template-2.dk-L-content .dk-ul{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 12px;list-style:none;padding:0;margin:15px 0 0}
+#view-deck .dk-template-2.dk-L-content .dk-ul li{display:flex;align-items:center;gap:9px;min-height:60px;padding:13px;border:1px solid rgba(34,222,222,.24);border-radius:10px;background:linear-gradient(130deg,rgba(25,88,146,.35),rgba(14,26,61,.48));font-size:.84em}
+#view-deck .dk-template-2.dk-L-content .dk-ul li:before{content:'✓';display:grid;place-items:center;flex:0 0 23px;height:23px;border-radius:50%;background:#12e8d81f;color:#22e5df;font-weight:900}
+/* Template 3: executive KPI cards */
+#view-deck .dk-template-3.dk-L-kpi .dk-kpi{background:linear-gradient(155deg,rgba(23,58,112,.68),rgba(9,21,49,.9));border-color:var(--k);box-shadow:0 8px 22px rgba(0,0,0,.15)}
+/* Template 4: refined chart */
+#view-deck .dk-template-4.dk-L-chart .dk-chart-row i{background:linear-gradient(90deg,#16e1d6,#3e83e9);border-radius:8px}
+/* Template 5: AI insight card */
+#view-deck .dk-template-5.dk-L-insight .dk-ins{border:1px solid rgba(126,94,255,.55);background:linear-gradient(125deg,rgba(78,57,154,.55),rgba(13,40,85,.7));box-shadow:0 8px 24px rgba(48,30,120,.15)}
+/* Template 6: structured action plan */
+#view-deck .dk-template-6.dk-L-content .dk-ul{list-style:none;padding:0;display:grid;gap:9px}
+#view-deck .dk-template-6.dk-L-content .dk-ul li{padding:11px 13px 11px 38px;position:relative;border:1px solid rgba(63,122,214,.35);border-radius:9px;background:rgba(24,49,96,.45)}
+#view-deck .dk-template-6.dk-L-content .dk-ul li:before{content:'✓';position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#24e2d5;font-weight:900}
+@media(hover:none){#view-deck .dk-thumb-del{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){#view-deck .dk-thumb-del{transition:none}}
+
+
+/* Hybrid data period controls; scoped to Deck Studio only */
+#view-deck .dk-period-dates{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0}#view-deck .dk-period-dates input,#view-deck #dkPeriod{width:100%;min-width:0;background:#101f3b;color:#e9f4ff;border:1px solid #344e74;border-radius:9px;padding:9px;font:inherit}#view-deck .dk-generate{border-color:#16dccc;color:#12e8d8;font-weight:700;margin:12px 0}@media(max-width:520px){#view-deck .dk-period-dates{grid-template-columns:1fr}}
+
+/* Manual objects and Joni AI gallery */
+#view-deck .dk-s{position:absolute}#view-deck .dk-object{position:absolute;z-index:12;touch-action:none;user-select:none;cursor:move;overflow:visible}#view-deck .dk-object img{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none}#view-deck .dk-obj-icon{display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:clamp(16px,4vw,90px)}#view-deck .dk-obj-shape{width:100%;height:100%;border:3px solid currentColor;background:color-mix(in srgb,currentColor 35%,transparent)}#view-deck .dk-obj-circle{border-radius:50%}#view-deck .dk-obj-line{height:0;border:0;border-top:4px solid currentColor;position:absolute;top:50%}#view-deck .dk-obj-arrow{clip-path:polygon(0 30%,65% 30%,65% 0,100% 50%,65% 100%,65% 70%,0 70%)}#view-deck .dk-obj-handle{position:absolute;right:-6px;bottom:-6px;width:13px;height:13px;border-radius:3px;background:#12e8d8;border:2px solid #fff;cursor:nwse-resize}#view-deck .dk-joni-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0}#view-deck .dk-joni-grid button{background:#112448;color:#e9f4ff;border:1px solid #345479;border-radius:9px;padding:8px;cursor:pointer;min-width:0}#view-deck .dk-joni-grid button img{width:100%;height:90px;object-fit:contain}#view-deck .dk-joni-grid button span{display:block;font-size:11px}#view-deck .dk-joni-assistant-img{width:62px;height:62px;object-fit:contain}#view-deck [data-objfield]{display:block;max-width:100%;margin:5px 0 10px}#view-deck .dk-object:has(.dk-obj-handle):hover{outline:1px dashed #12e8d8}
+
+/* Joni AI image objects: prevent inherited opaque backgrounds without changing slide layout */
+#view-deck .dk-object:has(> img[src*="joni-ai/"]),#view-deck .dk-object > img[src*="joni-ai/"]{background:transparent!important;background-color:transparent!important;box-shadow:none}
