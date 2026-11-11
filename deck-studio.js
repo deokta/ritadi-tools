@@ -339,7 +339,21 @@ const ACT={
   shape(){say('Bentuk bebas belum tersedia')},icon(){say('Ikon bebas belum tersedia')},
   logo(){say('Logo JNE sudah tersedia pada tema slide')},video(){say('Video belum didukung dalam ekspor PPTX')},
   assistant(){st.tab='ai';drawSide()},contenttab(){st.tab='content';drawSide()},
-  insertkpi(){insertLayout('kpi')},insertchart(){insertLayout('chart')},inserttable(){insertLayout('table')}
+
+  uploadcover(){
+    let input = document.getElementById('dkCoverInput');
+    if (!input) {
+      input = document.createElement('input');
+      input.id = 'dkCoverInput';
+      input.type = 'file';
+      input.accept = 'image/png,image/jpeg';
+      input.hidden = true;
+      document.body.appendChild(input);
+    }
+    input.click();
+  },
+
+   insertkpi(){insertLayout('kpi')},insertchart(){insertLayout('chart')},inserttable(){insertLayout('table')}
 };
 let zoom=100;function applyZoom(){q('#dkZoom').textContent=zoom+'%';q('#dkFrame').style.transform='scale('+(zoom/100)+')';q('#dkFrame').style.transformOrigin='center center'}
 function insertLayout(layout){if(st.deck.slides.length>=MAX_SLIDES)return say('Maksimal '+MAX_SLIDES+' slide');const x=emptySlide(layout);x.title=LAYOUTS[layout].n;st.deck.slides.splice(st.sel+1,0,x);st.sel++;st.tab='content';drawAll();dirty()}
