@@ -322,3 +322,9 @@
 .dk-L-title:has(.dk-cover-photo) .dk-main{width:64%;z-index:2}
 .dk-L-title:has(.dk-cover-photo) .dk-brand{z-index:3}
 .dk-cover-controls{display:grid;gap:7px}
+
+@media (min-width: 901px) {
+  body.dk-on .hero {
+    display: none;
+  }
+}
