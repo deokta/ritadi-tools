@@ -11,6 +11,8 @@ if(!main||document.getElementById('view-deck'))return;
 
 /* ---------- konstanta ---------- */
 const PFX='leguti_deck_v1_',MAX_SLIDES=50,MAX_NAME=80,SAVE_MS=350;
+const THEMES={midnight:{name:'Midnight',accent:'#12e8d8'},arctic:{name:'Arctic',accent:'#2676e9'},aurora:{name:'Aurora',accent:'#b26cff'}};
+const PALETTE=['#12e8d8','#148ab9','#457af8','#8b5cf6','#e6489c','#ff9952'];
 const KPI_COLORS=['#2f7bff','#8b5cf6','#14e0c4','#f59e0b'];
 const FIELDS={
   kicker:{l:'Label atas',t:'line',m:50,p:'Contoh: Monthly Operations Review'},
@@ -36,6 +38,8 @@ const LAYOUTS={
     i:svg('<rect x="3" y="3" width="48" height="30" rx="3"/><path d="M9 10h14"/><rect x="7" y="16" width="8" height="12" rx="1.5"/><rect x="17" y="16" width="8" height="12" rx="1.5"/><rect x="27" y="16" width="8" height="12" rx="1.5"/><rect x="37" y="16" width="8" height="12" rx="1.5"/>')},
   insight:{n:'Insight',f:['title','insight','body'],
     i:svg('<rect x="3" y="3" width="48" height="30" rx="3"/><path d="M9 9h14"/><rect x="8" y="14" width="38" height="9" rx="2"/><path d="M10 28h22"/>')},
+  chart:{n:'Grafik',f:['title','body'],i:svg('<rect x="3" y="3" width="48" height="30" rx="3"/><path d="M10 27V17h7v10M22 27V10h7v17M34 27V14h7v13"/>')},
+  table:{n:'Tabel',f:['title','body'],i:svg('<rect x="4" y="4" width="46" height="28" rx="2"/><path d="M4 13h46M4 22h46M20 4v28M35 4v28"/>')},
   section:{n:'Pembatas Bagian',f:['kicker','title','subtitle'],
     i:svg('<rect x="3" y="3" width="48" height="30" rx="3"/><path d="M9 12v12"/><path d="M14 15h22M14 21h14"/>')}
 };
@@ -51,7 +55,10 @@ const NEW_IC={
   dkPrev:'M15 18l-6-6 6-6',
   dkNext:'M9 18l6-6-6-6',
   dkLay:'M4 4h16v16H4z M4 10h16 M10 10v10',
-  dkEdit:'M4 20h4L19 9l-4-4L4 16z M13 7l4 4'
+  dkEdit:'M4 20h4L19 9l-4-4L4 16z M13 7l4 4',
+  dkDownload:'M12 3v12 M7 10l5 5 5-5 M4 17v4h16v-4',dkSave:'M4 4h14l2 2v14H4z M8 4v6h8V4 M8 20v-7h8v7',
+  dkPlay:'M8 5l11 7-11 7z',dkExpand:'M4 9V4h5 M15 4h5v5 M20 15v5h-5 M9 20H4v-5',
+  dkData:'M4 5h16v14H4z M4 10h16 M10 10v9',dkSpark:'M12 3l2.3 6.7L21 12l-6.7 2.3L12 21l-2.3-6.7L3 12l6.7-2.3z'
 };
 Object.keys(NEW_IC).forEach(k=>{if(!(k in IC))IC[k]=NEW_IC[k]});
 const icon=k=>typeof ico==='function'?ico(k):'';
@@ -83,14 +90,17 @@ function sampleDeck(){
   const b=emptySlide('content');Object.assign(b,{title:'Ringkasan Eksekutif',body:'Capaian utama periode ini\nKendala yang perlu perhatian\nRencana tindak lanjut'});
   const c=emptySlide('kpi');Object.assign(c,{title:'Indikator Kinerja',subtitle:'Isi nilai dari laporan operasional terbaru.',
     k:[{v:'—',l:'Total AWB'},{v:'—',l:'Selesai'},{v:'—',l:'Pencapaian'},{v:'—',l:'Belum selesai'}]});
-  return{name:'Presentasi Operasional',slides:[a,b,c]};
+  const d=emptySlide('chart');Object.assign(d,{title:'Tren Operasional',body:'Senin: 1200\nSelasa: 1600\nRabu: 1450\nKamis: 2100\nJumat: 1850'});
+  const e=emptySlide('insight');Object.assign(e,{title:'Operational Insights',insight:'Prioritaskan penyelesaian kendala manifest dan produktivitas.',body:'Evaluasi lane dengan backlog tertinggi\nOptimalkan alokasi petugas\nPantau tren harian'});
+  const f=emptySlide('content');Object.assign(f,{title:'Action Plan',body:'Monitoring performa setiap shift\nReview hasil operasional mingguan\nTindak lanjut anomali data'});
+  return{name:'Presentasi Operasional',slides:[a,b,c,d,e,f],theme:'midnight',accent:'#12e8d8',background:'solid'};
 }
 function load(k){
   try{
     const o=JSON.parse(localStorage.getItem(PFX+k));
     if(o&&o.deck&&Array.isArray(o.deck.slides)&&o.deck.slides.length){
       const slides=o.deck.slides.slice(0,MAX_SLIDES).map(cleanSlide);
-      return{deck:{name:clip(o.deck.name,MAX_NAME)||'Presentasi Operasional',slides},sel:Math.min(Math.max(+o.sel||0,0),slides.length-1),tab:'design'};
+      return{deck:{name:clip(o.deck.name,MAX_NAME)||'Presentasi Operasional',slides,theme:THEMES[o.deck.theme]?o.deck.theme:'midnight',accent:/^#[0-9a-f]{6}$/i.test(o.deck.accent)?o.deck.accent:'#12e8d8',background:['solid','gradient'].includes(o.deck.background)?o.deck.background:'solid'},sel:Math.min(Math.max(+o.sel||0,0),slides.length-1),tab:'design'};
     }
   }catch(_){}
   return{deck:sampleDeck(),sel:0,tab:'design'};
@@ -150,6 +160,10 @@ function slideHTML(s,n,edit){
           <div class="dk-kl${!kl?' dk-ph':''}"${edit?` data-f="k" data-k="${i}" data-p="l" tabindex="0"`:''}>${h(kl||(edit?'Nama metrik':''))}</div></div>`}).join('')}</div>${T('subtitle','dk-sub')}${foot}`;break;
     case'insight':
       b=`<div class="dk-hd">${T('title','dk-ti')}</div>${T('insight','dk-ins')}${UL('body')}${foot}`;break;
+    case'chart':
+      b=`<div class="dk-hd">${T('title','dk-ti')}</div><div class="dk-chart">${lines(s.body).slice(0,7).map((x,i)=>{const parts=x.split(':');const val=Math.max(0,Number(parts[1])||0);const max=Math.max(1,...lines(s.body).map(y=>Number(y.split(':')[1])||0));return`<div class="dk-chart-row"><span>${h(parts[0])}</span><div><i style="width:${Math.max(3,val/max*100)}%"></i></div><b>${h(parts[1]||'0')}</b></div>`}).join('')}</div>${foot}`;break;
+    case'table':
+      b=`<div class="dk-hd">${T('title','dk-ti')}</div><div class="dk-table">${lines(s.body).slice(0,7).map((x,i)=>`<div class="dk-table-row${i===0?' heading':''}">${x.split('|').slice(0,4).map(v=>`<span>${h(v.trim())}</span>`).join('')}</div>`).join('')}</div>${foot}`;break;
     case'section':
       b=`<div class="dk-shape"></div><div class="dk-main">${T('kicker','dk-kick')}${T('title','dk-ti')}${T('subtitle','dk-sub')}</div>${foot}`;break;
     default:
@@ -170,12 +184,14 @@ function build(){
   root.innerHTML=`
   <div class="dk-bar dk-pn">
     <div class="dk-ic">${icon('deck')}</div>
-    <label class="dk-nm"><span>Nama presentasi</span><input data-name maxlength="${MAX_NAME}" autocomplete="off"></label>
+    <label class="dk-nm"><span>LEGUTI Deck Studio <b class="dk-ai-tag">AI</b></span><input data-name maxlength="${MAX_NAME}" autocomplete="off" aria-label="Nama presentasi"></label>
     <div class="dk-sv" id="dkSv"><i></i><span>Tersimpan otomatis</span></div>
-    <button type="button" class="nb g" disabled title="Tersedia di tahap berikutnya" style="height:42px;margin:0">Ekspor PPTX</button>
+    <button type="button" class="dk-action" data-act="save">${icon('dkSave')}<span>Simpan Draft</span></button>
+    <button type="button" class="dk-action" data-act="preview">${icon('dkPlay')}<span>Preview</span></button>
+    <button type="button" class="dk-action primary" data-act="export">${icon('dkDownload')}<span>Ekspor PPTX</span></button>
   </div>
   <aside class="dk-list dk-pn" aria-label="Daftar slide">
-    <div class="dk-lh"><span id="dkLh"></span><button type="button" class="dk-add" data-act="add" aria-label="Tambah slide" title="Tambah slide">${icon('dkPlus')}</button></div>
+    <div class="dk-lh"><span id="dkLh"></span><button type="button" class="dk-add" data-act="add" aria-label="Tambah slide">${icon('dkPlus')}</button></div>
     <div class="dk-ths" id="dkThs"></div>
   </aside>
   <section class="dk-stage dk-pn" aria-label="Editor slide">
@@ -184,20 +200,26 @@ function build(){
       <button type="button" class="dk-ib" data-act="prev" aria-label="Slide sebelumnya">${icon('dkPrev')}</button>
       <span class="dk-cnt" id="dkCnt" aria-live="polite"></span>
       <button type="button" class="dk-ib" data-act="next" aria-label="Slide berikutnya">${icon('dkNext')}</button>
-      <span class="dk-sep"></span>
-      <button type="button" class="dk-ib" data-act="up" aria-label="Geser slide ke atas" title="Geser ke atas">${icon('dkUp')}</button>
-      <button type="button" class="dk-ib" data-act="down" aria-label="Geser slide ke bawah" title="Geser ke bawah">${icon('dkDown')}</button>
-      <button type="button" class="dk-ib" data-act="dup" title="Duplikat slide">${icon('dkCopy')}<span>Duplikat</span></button>
-      <button type="button" class="dk-ib dg" data-act="del" title="Hapus slide">${icon('dkTrash')}<span>Hapus</span></button>
+      <span class="dk-ctl-spacer"></span><span class="dk-ratio">▣ 16:9</span>
+      <button type="button" class="dk-ib" data-act="zoomout" title="Perkecil">−</button><span id="dkZoom">100%</span><button type="button" class="dk-ib" data-act="zoomin" title="Perbesar">+</button>
+      <button type="button" class="dk-ib" data-act="fullscreen" title="Layar penuh">${icon('dkExpand')}</button>
     </div>
   </section>
   <aside class="dk-side dk-pn" aria-label="Pengaturan slide">
     <div class="dk-tabs" role="tablist">
-      <button type="button" class="dk-tab" role="tab" data-act="tab" data-tab="design">${icon('dkLay')}Desain</button>
-      <button type="button" class="dk-tab" role="tab" data-act="tab" data-tab="content">${icon('dkEdit')}Konten</button>
+      <button type="button" class="dk-tab" role="tab" data-act="tab" data-tab="design">${icon('dkLay')}<span>Desain</span></button>
+      <button type="button" class="dk-tab" role="tab" data-act="tab" data-tab="content">${icon('dkEdit')}<span>Konten</span></button>
+      <button type="button" class="dk-tab" role="tab" data-act="tab" data-tab="data">${icon('dkData')}<span>Data</span></button>
+      <button type="button" class="dk-tab" role="tab" data-act="tab" data-tab="ai">${icon('dkSpark')}<span>Joni AI</span></button>
     </div>
     <div class="dk-sb" id="dkSb" role="tabpanel"></div>
-  </aside>`;
+  </aside>
+  <div class="dk-tools dk-pn" aria-label="Alat presentasi">
+    ${[['add','＋','Tambah Slide'],['text','T','Teks'],['image','▧','Gambar'],['chart','▥','Grafik'],['table','▦','Tabel'],['shape','⬡','Bentuk'],['icon','☆','Ikon'],['logo','JNE','Logo'],['video','▷','Video']].map(x=>`<button type="button" data-act="${x[0]}" title="${x[2]}"><strong>${x[1]}</strong><span>${x[2]}</span></button>`).join('')}
+    <button type="button" class="dk-assistant" data-act="assistant">✦ Joni AI Assistant</button>
+  </div>
+  <div class="dk-overlay" id="dkOverlay" hidden></div>`;
+
 }
 
 /* ---------- penggambaran ---------- */
@@ -227,9 +249,11 @@ function keepVisible(){
 function drawStage(){
   const n=st.deck.slides.length;
   q('#dkFrame').innerHTML=slideHTML(cur(),st.sel+1,true);
+  q('#dkFrame').style.setProperty('--dk-accent',st.deck.accent||'#12e8d8');
+  q('#dkFrame').dataset.theme=st.deck.theme||'midnight';q('#dkFrame').dataset.background=st.deck.background||'solid';
   q('#dkCnt').textContent='Slide '+(st.sel+1)+' dari '+n;
   const dis=(a,v)=>{q('[data-act="'+a+'"]').disabled=v};
-  dis('prev',st.sel===0);dis('next',st.sel===n-1);dis('up',st.sel===0);dis('down',st.sel===n-1);dis('del',n<=1);
+  dis('prev',st.sel===0);dis('next',st.sel===n-1);
   dis('add',n>=MAX_SLIDES);
 }
 function drawSide(){
@@ -237,11 +261,13 @@ function drawSide(){
   root.querySelectorAll('.dk-tab').forEach(t=>{const on=t.dataset.tab===st.tab;t.classList.toggle('on',on);t.setAttribute('aria-selected',on?'true':'false')});
   const sb=q('#dkSb');
   if(st.tab==='design'){
-    sb.innerHTML=`<div class="dk-sh">Layout slide</div><div class="dk-lay">${Object.keys(LAYOUTS).map(k=>
-      `<button type="button" class="dk-lb${k===s.layout?' on':''}" data-act="lay" data-lay="${k}" aria-pressed="${k===s.layout}">${LAYOUTS[k].i}<span>${h(LAYOUTS[k].n)}</span></button>`).join('')}</div>
-      <p class="dk-hint">Teks yang sudah diisi tetap tersimpan saat layout diganti, jadi Anda bisa mencoba layout lain tanpa kehilangan isi.</p>`;
+    sb.innerHTML=`<div class="dk-sh">Tema Presentasi</div><div class="dk-themes">${Object.entries(THEMES).map(([k,v])=>`<button type="button" class="dk-theme ${k}${st.deck.theme===k?' on':''}" data-act="theme" data-theme="${k}"><i></i><span>${v.name}</span></button>`).join('')}</div><div class="dk-sh">Palet Warna</div><div class="dk-colors">${PALETTE.map(c=>`<button type="button" data-act="color" data-color="${c}" class="${st.deck.accent===c?'on':''}" style="--sw:${c}" aria-label="Warna ${c}"></button>`).join('')}</div>`+ `<div class="dk-sh">Layout slide</div><div class="dk-lay">${Object.keys(LAYOUTS).map(k=>
+      `<button type="button" class="dk-lb${k===s.layout?' on':''}" data-act="lay" data-lay="${k}" aria-pressed="${k===s.layout}">${LAYOUTS[k].i}<span>${h(LAYOUTS[k].n)}</span></button>`).join('')}</div>`+
+      `<div class="dk-sh">Latar Belakang</div><div class="dk-backgrounds"><button type="button" data-act="background" data-bg="solid" class="${st.deck.background==='solid'?'on':''}">Solid</button><button type="button" data-act="background" data-bg="gradient" class="${st.deck.background==='gradient'?'on':''}">Gradasi</button></div><p class="dk-hint">Ganti layout tanpa kehilangan isi teks.</p>`;
     return;
   }
+  if(st.tab==='data'){sb.innerHTML=`<div class="dk-sh">Data Operasional</div><p class="dk-hint">Masukkan nilai yang telah diverifikasi pada slide KPI, Grafik, atau Tabel. Sinkronisasi otomatis dengan database belum diaktifkan.</p><button type="button" class="dk-side-btn" data-act="insertkpi">＋ Slide KPI</button><button type="button" class="dk-side-btn" data-act="insertchart">＋ Slide Grafik</button><button type="button" class="dk-side-btn" data-act="inserttable">＋ Slide Tabel</button>`;return}
+  if(st.tab==='ai'){sb.innerHTML=`<div class="dk-sh">Joni AI Assistant</div><p class="dk-hint">Asisten pembuatan presentasi. Integrasi AI khusus Deck Studio belum terhubung; gunakan tab Konten untuk menyusun slide saat ini.</p><button type="button" class="dk-side-btn" data-act="contenttab">Edit konten slide</button>`;return}
   const out=[`<p class="dk-hint" style="margin:0 0 14px">Ketik di sini atau klik teks langsung pada slide.</p>`];
   LAYOUTS[s.layout].f.forEach(f=>{
     if(f==='k'){
@@ -260,7 +286,7 @@ function drawSide(){
   sb.innerHTML=out.join('');
 }
 function drawAll(){
-  q('[data-name]').value=st.deck.name;
+  q('[data-name]').value=st.deck.name;root.style.setProperty('--dk-accent',st.deck.accent||'#12e8d8');
   drawList();drawStage();drawSide();
 }
 
@@ -299,8 +325,22 @@ const ACT={
     drawList();drawStage();drawSide();dirty();say('Slide dihapus');
   },
   up(){move(-1)},down(){move(1)},
-  prev(){select(st.sel-1)},next(){select(st.sel+1)}
+  prev(){select(st.sel-1)},next(){select(st.sel+1)},
+  save(){save();say('Draft tersimpan di browser ini')},
+  preview(){showPreview()},
+  export(){exportPPTX()},
+  fullscreen(){const el=q('.dk-stage');if(document.fullscreenElement)document.exitFullscreen();else if(el.requestFullscreen)el.requestFullscreen()},
+  zoomin(){zoom=Math.min(125,zoom+10);applyZoom()},zoomout(){zoom=Math.max(70,zoom-10);applyZoom()},
+  text(){st.tab='content';drawSide();focusField('title')},
+  image(){say('Gambar bebas belum didukung di versi ini; elemen teks dan slide tetap bisa diedit')},
+  chart(){insertLayout('chart')},table(){insertLayout('table')},
+  shape(){say('Bentuk bebas belum tersedia')},icon(){say('Ikon bebas belum tersedia')},
+  logo(){say('Logo JNE sudah tersedia pada tema slide')},video(){say('Video belum didukung dalam ekspor PPTX')},
+  assistant(){st.tab='ai';drawSide()},contenttab(){st.tab='content';drawSide()},
+  insertkpi(){insertLayout('kpi')},insertchart(){insertLayout('chart')},inserttable(){insertLayout('table')}
 };
+let zoom=100;function applyZoom(){q('#dkZoom').textContent=zoom+'%';q('#dkFrame').style.transform='scale('+(zoom/100)+')';q('#dkFrame').style.transformOrigin='center center'}
+function insertLayout(layout){if(st.deck.slides.length>=MAX_SLIDES)return say('Maksimal '+MAX_SLIDES+' slide');const x=emptySlide(layout);x.title=LAYOUTS[layout].n;st.deck.slides.splice(st.sel+1,0,x);st.sel++;st.tab='content';drawAll();dirty()}
 function move(d){
   const sl=st.deck.slides,j=st.sel+d;if(j<0||j>=sl.length)return;
   [sl[st.sel],sl[j]]=[sl[j],sl[st.sel]];st.sel=j;
@@ -313,6 +353,9 @@ root.addEventListener('click',e=>{
     const a=b.dataset.act;
     if(a==='sel')select(+b.dataset.i);
     else if(a==='tab'){st.tab=b.dataset.tab;drawSide()}
+    else if(a==='theme'){st.deck.theme=b.dataset.theme;st.deck.accent=THEMES[st.deck.theme].accent;drawAll();dirty()}
+    else if(a==='color'){st.deck.accent=b.dataset.color;drawAll();dirty()}
+    else if(a==='background'){st.deck.background=b.dataset.bg;drawAll();dirty()}
     else if(a==='lay'){const s=cur();if(s.layout!==b.dataset.lay&&LAYOUTS[b.dataset.lay]){s.layout=b.dataset.lay;drawList();drawStage();drawSide();dirty()}}
     else if(ACT[a])ACT[a]();
     return;
@@ -334,6 +377,38 @@ root.addEventListener('input',e=>{
   else s[f]=t.value;
   drawStage();drawThumb(st.sel);dirty();
 });
+
+/* ---------- preview & ekspor editable PPTX ---------- */
+function showPreview(){
+ const ov=q('#dkOverlay');let i=st.sel;
+ function render(){ov.innerHTML=`<div class="dk-preview-top"><b>${h(st.deck.name)}</b><span>Slide ${i+1} / ${st.deck.slides.length}</span><button type="button" data-prev="close">✕ Tutup</button></div><div class="dk-preview-slide">${slideHTML(st.deck.slides[i],i+1,false)}</div><div class="dk-preview-bottom"><button type="button" data-prev="back">← Sebelumnya</button><button type="button" data-prev="forward">Berikutnya →</button></div>`;ov.querySelector('.dk-preview-slide').style.setProperty('--dk-accent',st.deck.accent);ov.querySelector('.dk-preview-slide').dataset.theme=st.deck.theme}
+ ov.hidden=false;render();
+ ov.onclick=e=>{const a=e.target.closest('[data-prev]')?.dataset.prev;if(a==='close'){ov.hidden=true;ov.onclick=null}else if(a==='back'){i=Math.max(0,i-1);render()}else if(a==='forward'){i=Math.min(st.deck.slides.length-1,i+1);render()}};
+}
+let pptxLoading=null;
+function loadPptx(){if(window.pptxgen)return Promise.resolve(window.pptxgen);if(pptxLoading)return pptxLoading;
+ pptxLoading=new Promise((resolve,reject)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js';sc.onload=()=>window.pptxgen?resolve(window.pptxgen):reject(new Error('Pustaka PowerPoint tidak tersedia'));sc.onerror=()=>reject(new Error('Gagal memuat pustaka PowerPoint. Periksa koneksi internet.'));document.head.appendChild(sc)}).catch(e=>{pptxLoading=null;throw e});return pptxLoading}
+async function exportPPTX(){const btn=q('[data-act="export"]');btn.disabled=true;const prev=btn.innerHTML;btn.textContent='Membuat PPTX…';
+ try{const P=await loadPptx(),pptx=new P();pptx.layout='LAYOUT_WIDE';pptx.author='LEGUTI Operations Intelligence';pptx.subject='Outbound Performance';pptx.title=st.deck.name;pptx.lang='id-ID';
+ const accent=(st.deck.accent||'#12e8d8').replace('#','');const dark=st.deck.theme!=='arctic',bg=dark?(st.deck.theme==='aurora'?'150E35':'07132D'):'EFF6FF',fg=dark?'FFFFFF':'12264A';
+ const tx=(slide,text,x,y,w,h,size=22,opt={})=>{if(!String(text||'').trim())return;slide.addText(String(text),{x,y,w,h,fontFace:'Aptos',fontSize:size,color:fg,margin:0,breakLine:false,fit:'shrink',...opt})};
+ st.deck.slides.forEach((s,i)=>{const sl=pptx.addSlide();sl.background={color:bg};sl.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.333,h:.08,line:{color:accent},fill:{color:accent}});
+ if(s.layout==='title'||s.layout==='section'){
+ sl.addShape(pptx.ShapeType.chevron,{x:10.8,y:0,w:2.55,h:7.5,line:{color:accent,transparency:100},fill:{color:accent,transparency:77}});
+ tx(sl,'JNE  |  LEGUTI',.8,.45,5,.45,20,{bold:true});tx(sl,s.kicker,.8,2.0,10,.35,15,{bold:true,color:accent,charSpacing:2});tx(sl,s.title,.8,2.5,10.8,1.45,42,{bold:true});tx(sl,s.subtitle,.8,4.45,10,.75,23,{italic:true});tx(sl,s.meta,.8,5.5,8,.5,18);
+ }else{
+ tx(sl,s.title,.75,.55,11.8,.75,31,{bold:true});sl.addShape(pptx.ShapeType.line,{x:.75,y:1.45,w:1.3,h:0,line:{color:accent,width:3}});
+ if(s.layout==='kpi'){s.k.forEach((k,j)=>{const x=.75+j*3.16;sl.addShape(pptx.ShapeType.roundRect,{x,y:2.45,w:2.9,h:2.0,rectRadius:.15,line:{color:accent,width:1},fill:{color:dark?'11244B':'FFFFFF'}});tx(sl,k.v,x+.2,2.85,2.5,.7,29,{bold:true,color:accent});tx(sl,k.l,x+.2,3.65,2.5,.5,16)});tx(sl,s.subtitle,.8,5.2,11,.65,17)}
+ else if(s.layout==='twocol'){[[s.leftHead,s.left],[s.rightHead,s.right]].forEach(([hd,body],j)=>{const x=.75+j*6.35;sl.addShape(pptx.ShapeType.roundRect,{x,y:2.0,w:5.9,h:4.35,rectRadius:.12,line:{color:accent,width:1},fill:{color:dark?'11244B':'FFFFFF'}});tx(sl,hd,x+.3,2.35,5.3,.55,22,{bold:true,color:accent});tx(sl,lines(body).map(v=>'• '+v).join('\n'),x+.3,3.15,5.3,2.7,18,{breakLine:false})})}
+ else if(s.layout==='insight'){sl.addShape(pptx.ShapeType.roundRect,{x:.8,y:2,w:11.7,h:1.6,rectRadius:.1,line:{color:accent,width:1},fill:{color:dark?'18275C':'FFFFFF'}});tx(sl,s.insight,1.2,2.28,10.9,1.0,23,{bold:true});tx(sl,lines(s.body).map(v=>'• '+v).join('\n'),1,4.0,11,2.2,20)}
+ else if(s.layout==='chart'){const vals=lines(s.body).slice(0,7).map(x=>{const a=x.split(':');return{label:a[0],value:Math.max(0,Number(a[1])||0)}}),max=Math.max(1,...vals.map(v=>v.value));vals.forEach((v,j)=>{const y=1.9+j*.66;tx(sl,v.label,.85,y,2.2,.4,15);sl.addShape(pptx.ShapeType.rect,{x:3,y:y+.06,w:Math.max(.05,v.value/max*8),h:.3,line:{color:accent,transparency:100},fill:{color:accent}});tx(sl,String(v.value),11.3,y,1.2,.4,15)})}
+ else if(s.layout==='table'){lines(s.body).slice(0,8).forEach((line,j)=>{const parts=line.split('|').slice(0,4);parts.forEach((part,k)=>{const x=.85+k*3.05,y=1.9+j*.59;sl.addShape(pptx.ShapeType.rect,{x,y,w:3.0,h:.55,line:{color:'375178',width:.5},fill:{color:j===0?accent:(dark?'102348':'FFFFFF')}});tx(sl,part.trim(),x+.12,y+.11,2.75,.35,13,{bold:j===0,color:j===0?'06172E':fg})})})}
+ else tx(sl,lines(s.body).map(v=>'• '+v).join('\n'),1,2,11.3,4.4,23);
+ }
+ tx(sl,'LEGUTI  •  Operations Intelligence',.8,7.06,8,.25,9,{color:accent});tx(sl,String(i+1),12.3,7.06,.3,.25,9,{align:'right'});
+ });
+ const name=(st.deck.name||'LEGUTI-Deck').replace(/[\\/:*?"<>|]/g,'-').slice(0,60)+'.pptx';await pptx.writeFile({fileName:name});say('PowerPoint berhasil diekspor (teks dan bentuk dapat diedit)')
+ }catch(e){console.error('[Deck Studio PPTX]',e);alert('Ekspor PPTX gagal: '+e.message)}finally{btn.disabled=false;btn.innerHTML=prev}}
 
 /* ---------- integrasi ke dashboard (tanpa mengubah fitur yang ada) ---------- */
 // Item menu baru, ditempatkan sebelum "Pengaturan".
