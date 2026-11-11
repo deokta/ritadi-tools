@@ -29,7 +29,14 @@ async function importCsv(file){if(!file||!auth())return;const lines=parseCsv(awa
 // Import JNE operational Excel: detailed AWB rows and hierarchical status/service/area pivots.
 const norm=s=>String(s??'').trim().toUpperCase().replace(/\s+/g,' ');
 const canonical=s=>{const n=norm(s);return ({'DEPSACT CGK':'JAKARTA','BDBC':'BDBCBDO','SUMATERA':'SUMATRA'})[n]||n};
-const statusOf=s=>{const n=norm(s);if(n.includes('UNRECEIVING')||n.includes('UN RECEIVING'))return 'UNRECEIVING';if(n.includes('UNMANIFEST')||n.includes('UN MANIFEST'))return 'UNMANIFEST';if(/\bPS2\b/.test(n)||n.includes('MISSROUTE'))return 'PS2';if(/\bPS8\b/.test(n)||n.includes('LOLOS MANIFEST'))return 'PS8';return ''};
+const statusOf=s=>{
+ const n=norm(s).replace(/[_-]/g,' ');
+ if(/\bUN\s*RECEIVING\b/.test(n))return 'UNRECEIVING';
+ if(/\bUN\s*MANIFEST\b/.test(n))return 'UNMANIFEST';
+ if(/\bPS\s*2\b/.test(n)||n.includes('MISSROUTE'))return 'PS2';
+ if(/\bPS\s*8\b/.test(n)||n.includes('LOLOS MANIFEST'))return 'PS8';
+ return '';
+};
 const isoDate=(v,year)=>{
  if(v instanceof Date&&!isNaN(v))return [v.getFullYear(),String(v.getMonth()+1).padStart(2,'0'),String(v.getDate()).padStart(2,'0')].join('-');
  if(typeof v==='number'&&v>20000&&v<100000){const d=new Date(Math.round((v-25569)*86400000));return d.toISOString().slice(0,10)}
