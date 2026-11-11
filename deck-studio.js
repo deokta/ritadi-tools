@@ -62,6 +62,8 @@ const NEW_IC={
 };
 Object.keys(NEW_IC).forEach(k=>{if(!(k in IC))IC[k]=NEW_IC[k]});
 const icon=k=>typeof ico==='function'?ico(k):'';
+ const JONI_MARK=`<svg class="dk-joni-mark" viewBox="0 0 48 48" aria-hidden="true" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="12" width="32" height="27" rx="10" fill="#DAE9FF" stroke="#A8C5FF" stroke-width="2"/><rect x="13" y="19" width="22" height="13" rx="6" fill="#172C61"/><circle cx="19" cy="25" r="2.4" fill="#27E9E3"/><circle cx="29" cy="25" r="2.4" fill="#27E9E3"/><path d="M20 35h8" stroke="#6278C7" stroke-width="2" stroke-linecap="round"/><path d="M24 12V7" stroke="#A8C5FF" stroke-width="2.5" stroke-linecap="round"/><circle cx="24" cy="6" r="3" fill="#9E7AFF"/><path d="M8 24H5m38 0h-3" stroke="#A8C5FF" stroke-width="3" stroke-linecap="round"/></svg>`;
+
 
 /* ---------- util ---------- */
 const h=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -88,11 +90,11 @@ function cleanSlide(o){
 function sampleDeck(){
   const mo=new Date().toLocaleDateString('id-ID',{month:'long',year:'numeric'});
   const a=emptySlide('title');Object.assign(a,{kicker:'Monthly Operations Review',title:'Outbound Performance Report',subtitle:'Intelligence-driven operational reporting',meta:mo});
-  const b=emptySlide('content');Object.assign(b,{title:'Ringkasan Eksekutif',body:'Capaian utama periode ini\nKendala yang perlu perhatian\nRencana tindak lanjut'});
-  const c=emptySlide('kpi');Object.assign(c,{title:'Indikator Kinerja',subtitle:'Isi nilai dari laporan operasional terbaru.',
+  const b=emptySlide('content');Object.assign(b,{title:'Executive Summary',body:'Overview operasional\nCapaian utama\nTantangan & risiko\nPrioritas tindak lanjut'});
+  const c=emptySlide('kpi');Object.assign(c,{title:'KPI Performance',subtitle:'Data KPI dapat diedit atau diisi dari laporan operasional.',
     k:[{v:'—',l:'Total AWB'},{v:'—',l:'Selesai'},{v:'—',l:'Pencapaian'},{v:'—',l:'Belum selesai'}]});
   const d=emptySlide('chart');Object.assign(d,{title:'Tren Operasional',body:'Senin: 1200\nSelasa: 1600\nRabu: 1450\nKamis: 2100\nJumat: 1850'});
-  const e=emptySlide('insight');Object.assign(e,{title:'Operational Insights',insight:'Prioritaskan penyelesaian kendala manifest dan produktivitas.',body:'Evaluasi lane dengan backlog tertinggi\nOptimalkan alokasi petugas\nPantau tren harian'});
+  const e=emptySlide('insight');Object.assign(e,{title:'Joni AI Insight',insight:'Prioritaskan penyelesaian kendala manifest dan produktivitas.',body:'Evaluasi lane dengan backlog tertinggi\nOptimalkan alokasi petugas\nPantau tren harian'});
   const f=emptySlide('content');Object.assign(f,{title:'Action Plan',body:'Monitoring performa setiap shift\nReview hasil operasional mingguan\nTindak lanjut anomali data'});
   return{name:'Presentasi Operasional',slides:[a,b,c,d,e,f],theme:'midnight',accent:'#12e8d8',background:'solid'};
 }
@@ -170,7 +172,7 @@ function slideHTML(s,n,edit){
     default:
       b=`<div class="dk-hd">${T('title','dk-ti')}</div>${UL('body')}${foot}`;
   }
-  return`<div class="dk-s dk-L-${LAYOUTS[s.layout]?s.layout:'content'}${edit?' dk-e':''}">${b}</div>`;
+  return`<div class="dk-s dk-L-${LAYOUTS[s.layout]?s.layout:'content'} dk-template-${Math.min(n,6)}${edit?' dk-e':''}">${b}</div>`;
 }
 
 /* ---------- kerangka DOM ---------- */
@@ -211,13 +213,13 @@ function build(){
       <button type="button" class="dk-tab" role="tab" data-act="tab" data-tab="design">${icon('dkLay')}<span>Desain</span></button>
       <button type="button" class="dk-tab" role="tab" data-act="tab" data-tab="content">${icon('dkEdit')}<span>Konten</span></button>
       <button type="button" class="dk-tab" role="tab" data-act="tab" data-tab="data">${icon('dkData')}<span>Data</span></button>
-      <button type="button" class="dk-tab" role="tab" data-act="tab" data-tab="ai">${icon('dkSpark')}<span>Joni AI</span></button>
+      <button type="button" class="dk-tab" role="tab" data-act="tab" data-tab="ai">${JONI_MARK}<span>Joni AI</span></button>
     </div>
     <div class="dk-sb" id="dkSb" role="tabpanel"></div>
   </aside>
   <div class="dk-tools dk-pn" aria-label="Alat presentasi">
     ${[['add','＋','Tambah Slide'],['text','T','Teks'],['image','▧','Gambar'],['chart','▥','Grafik'],['table','▦','Tabel'],['shape','⬡','Bentuk'],['icon','☆','Ikon'],['logo','JNE','Logo'],['video','▷','Video']].map(x=>`<button type="button" data-act="${x[0]}" title="${x[2]}"><strong>${x[1]}</strong><span>${x[2]}</span></button>`).join('')}
-    <button type="button" class="dk-assistant" data-act="assistant">✦ Joni AI Assistant</button>
+    <button type="button" class="dk-assistant" data-act="assistant">${JONI_MARK}<span>Joni AI Assistant</span></button>
   </div>
   <input id="dkCoverInput" type="file" accept="image/png,image/jpeg" hidden>
   <div class="dk-overlay" id="dkOverlay" hidden></div>`;
@@ -232,7 +234,7 @@ function drawList(){
     const t=s.title||LAYOUTS[s.layout].n;
     return`<div class="dk-tr${i===st.sel?' on':''}"><span class="dk-no">${i+1}</span>
       <button type="button" class="dk-th${i===st.sel?' on':''}" data-act="sel" data-i="${i}" aria-label="Slide ${i+1}: ${h(t)}"${i===st.sel?' aria-current="true"':''}>
-      <span class="dk-fr" aria-hidden="true">${slideHTML(s,i+1,false)}</span></button></div>`;
+      <span class="dk-fr" aria-hidden="true">${slideHTML(s,i+1,false)}</span></button><button type="button" class="dk-thumb-del" data-act="delthumb" data-i="${i}" title="Hapus slide ${i+1}" aria-label="Hapus slide ${i+1}">${icon('dkTrash')||'✕'}</button></div>`;
   }).join('');
   keepVisible();
 }
@@ -269,7 +271,7 @@ function drawSide(){
     return;
   }
   if(st.tab==='data'){sb.innerHTML=`<div class="dk-sh">Data Operasional</div><p class="dk-hint">Masukkan nilai yang telah diverifikasi pada slide KPI, Grafik, atau Tabel. Sinkronisasi otomatis dengan database belum diaktifkan.</p><button type="button" class="dk-side-btn" data-act="insertkpi">＋ Slide KPI</button><button type="button" class="dk-side-btn" data-act="insertchart">＋ Slide Grafik</button><button type="button" class="dk-side-btn" data-act="inserttable">＋ Slide Tabel</button>`;return}
-  if(st.tab==='ai'){sb.innerHTML=`<div class="dk-sh">Joni AI Assistant</div><p class="dk-hint">Asisten pembuatan presentasi. Integrasi AI khusus Deck Studio belum terhubung; gunakan tab Konten untuk menyusun slide saat ini.</p><button type="button" class="dk-side-btn" data-act="contenttab">Edit konten slide</button>`;return}
+  if(st.tab==='ai'){sb.innerHTML=`<div class="dk-joni-heading">${JONI_MARK}<b>Joni AI Assistant</b></div><p class="dk-hint">Asisten pembuatan presentasi. Integrasi AI khusus Deck Studio belum terhubung; gunakan tab Konten untuk menyusun slide saat ini.</p><button type="button" class="dk-side-btn" data-act="contenttab">Edit konten slide</button>`;return}
   const out=[`<p class="dk-hint" style="margin:0 0 14px">Ketik di sini atau klik teks langsung pada slide.</p>`];
   LAYOUTS[s.layout].f.forEach(f=>{
     if(f==='k'){
@@ -326,6 +328,16 @@ const ACT={
     sl.splice(st.sel,1);st.sel=Math.min(st.sel,sl.length-1);
     drawList();drawStage();drawSide();dirty();say('Slide dihapus');
   },
+   delthumb(i){
+     const sl=st.deck.slides;
+     if(sl.length<=1){say('Presentasi minimal punya 1 slide');return}
+     if(!Number.isInteger(i)||i<0||i>=sl.length)return;
+     if(!confirm('Hapus slide '+(i+1)+'?'))return;
+     sl.splice(i,1);
+     if(st.sel>i)st.sel--;
+     else if(st.sel===i)st.sel=Math.min(i,sl.length-1);
+     drawAll();dirty();say('Slide dihapus');
+   },
   up(){move(-1)},down(){move(1)},
   prev(){select(st.sel-1)},next(){select(st.sel+1)},
   save(){save();say('Draft tersimpan di browser ini')},
@@ -367,6 +379,7 @@ root.addEventListener('click',e=>{
   if(b&&root.contains(b)){
     const a=b.dataset.act;
     if(a==='sel')select(+b.dataset.i);
+     else if(a==='delthumb')ACT.delthumb(Number(b.dataset.i));
     else if(a==='tab'){st.tab=b.dataset.tab;drawSide()}
     else if(a==='theme'){st.deck.theme=b.dataset.theme;st.deck.accent=THEMES[st.deck.theme].accent;drawAll();dirty()}
     else if(a==='color'){st.deck.accent=b.dataset.color;drawAll();dirty()}
