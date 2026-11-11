@@ -76,8 +76,28 @@ const say=t=>{try{typeof toast==='function'&&toast(t)}catch(_){}};
 /* ---------- model ---------- */
 const emptySlide=layout=>({
   id:rid(),layout,coverImage:'',kicker:'',title:'',subtitle:'',meta:'',body:'',leftHead:'',left:'',rightHead:'',right:'',insight:'',
-  k:[{v:'',l:''},{v:'',l:''},{v:'',l:''},{v:'',l:''}]
+  objects:[],k:[{v:'',l:''},{v:'',l:''},{v:'',l:''},{v:'',l:''}]
 });
+const DK_ICONS={star:'★',check:'✓',warning:'⚠',target:'◎',truck:'🚚',package:'▣',chart:'▥',clock:'◷',person:'♟',arrow:'➜',heart:'♥',bolt:'ϟ'};
+function cleanObject(o){
+ if(!o||typeof o!=='object'||!['image','shape','icon'].includes(o.type))return null;
+ const num=(v,d,min,max)=>Number.isFinite(+v)?Math.max(min,Math.min(max,+v)):d;
+ const a={id:typeof o.id==='string'?o.id.slice(0,30):rid(),type:o.type,x:num(o.x,28,0,99),y:num(o.y,28,0,99),w:num(o.w,25,2,100),h:num(o.h,22,2,100),color:/^#[0-9a-f]{6}$/i.test(o.color)?o.color:'#12e8d8'};
+ if(o.type==='image'){if(typeof o.src!=='string'||!/^data:image\/(?:png|jpeg);base64,/.test(o.src)||o.src.length>1900000)return null;a.src=o.src}
+ if(o.type==='shape')a.kind=['rect','ellipse','line','arrow'].includes(o.kind)?o.kind:'rect';
+ if(o.type==='icon')a.kind=Object.hasOwn(DK_ICONS,o.kind)?o.kind:'star';
+ return a;
+}
+function objectHTML(s,edit){return (s.objects||[]).map(o=>{
+ const style=`left:${o.x}%;top:${o.y}%;width:${o.w}%;height:${o.h}%;--dk-obj-color:${o.color}`;
+ let inside='';
+ if(o.type==='image')inside=`<img draggable="false" src="${o.src}" alt="Gambar slide">`;
+ else if(o.type==='icon')inside=`<span class="dk-object-icon">${DK_ICONS[o.kind]}</span>`;
+ else if(o.kind==='line'||o.kind==='arrow')inside=`<svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M3 50 L${o.kind==='arrow'?'84':'97'} 50" stroke="${o.color}" stroke-width="4" fill="none" vector-effect="non-scaling-stroke"/>${o.kind==='arrow'?`<path d="M77 28 L97 50 L77 72" stroke="${o.color}" stroke-width="4" fill="none" vector-effect="non-scaling-stroke"/>`:''}</svg>`;
+ else inside=`<span class="dk-object-shape ${o.kind}" ></span>`;
+ return `<div class="dk-object dk-object-${o.type}${edit&&selectedObject===o.id?' selected':''}" style="${style}" data-obj="${h(o.id)}" ${edit?'tabindex="0"':''}>${inside}${edit?'<span class="dk-object-handle" data-resize="1" title="Ubah ukuran"></span>':''}</div>`;
+ }).join('')}
+let selectedObject=null;
 function cleanSlide(o){
   const s=emptySlide(LAYOUTS[o&&o.layout]?o.layout:'content');
   if(!o||typeof o!=='object')return s;
@@ -85,6 +105,7 @@ function cleanSlide(o){
   if(typeof o.coverImage==='string' && /^data:image\/(?:jpeg|png);base64,/.test(o.coverImage) && o.coverImage.length<1400000)s.coverImage=o.coverImage;
   Object.keys(FIELDS).forEach(f=>{s[f]=clip(o[f],FIELDS[f].m)});
   if(Array.isArray(o.k))s.k=s.k.map((_,i)=>({v:clip(o.k[i]&&o.k[i].v,9),l:clip(o.k[i]&&o.k[i].l,40)}));
+  if(Array.isArray(o.objects))s.objects=o.objects.slice(0,35).map(cleanObject).filter(Boolean);
   if(o.autoSource&&typeof o.autoSource==='string')s.autoSource=clip(o.autoSource,50);
   return s;
 }
@@ -173,7 +194,7 @@ function slideHTML(s,n,edit){
     default:
       b=`<div class="dk-hd">${T('title','dk-ti')}</div>${UL('body')}${foot}`;
   }
-  return`<div class="dk-s dk-L-${LAYOUTS[s.layout]?s.layout:'content'} dk-template-${Math.min(n,6)}${edit?' dk-e':''}">${b}</div>`;
+  return`<div class="dk-s dk-L-${LAYOUTS[s.layout]?s.layout:'content'} dk-template-${Math.min(n,6)}${edit?' dk-e':''}">${b}${objectHTML(s,edit)}</div>`;
 }
 
 /* ---------- kerangka DOM ---------- */
@@ -222,6 +243,7 @@ function build(){
     ${[['add','＋','Tambah Slide'],['text','T','Teks'],['image','▧','Gambar'],['chart','▥','Grafik'],['table','▦','Tabel'],['shape','⬡','Bentuk'],['icon','☆','Ikon'],['logo','JNE','Logo'],['video','▷','Video']].map(x=>`<button type="button" data-act="${x[0]}" title="${x[2]}"><strong>${x[1]}</strong><span>${x[2]}</span></button>`).join('')}
     <button type="button" class="dk-assistant" data-act="assistant">${JONI_MARK}<span>Joni AI Assistant</span></button>
   </div>
+  <input id="dkImageInput" type="file" accept="image/png,image/jpeg" hidden>
   <input id="dkCoverInput" type="file" accept="image/png,image/jpeg" hidden>
   <div class="dk-overlay" id="dkOverlay" hidden></div>`;
 
@@ -265,6 +287,7 @@ function drawSide(){
   const s=cur();
   root.querySelectorAll('.dk-tab').forEach(t=>{const on=t.dataset.tab===st.tab;t.classList.toggle('on',on);t.setAttribute('aria-selected',on?'true':'false')});
   const sb=q('#dkSb');
+  if(st.tab==='objects'){drawObjectSide();return}
   if(st.tab==='design'){
     sb.innerHTML=`<div class="dk-sh">Tema Presentasi</div><div class="dk-themes">${Object.entries(THEMES).map(([k,v])=>`<button type="button" class="dk-theme ${k}${st.deck.theme===k?' on':''}" data-act="theme" data-theme="${k}"><i></i><span>${v.name}</span></button>`).join('')}</div><div class="dk-sh">Palet Warna</div><div class="dk-colors">${PALETTE.map(c=>`<button type="button" data-act="color" data-color="${c}" class="${st.deck.accent===c?'on':''}" style="--sw:${c}" aria-label="Warna ${c}"></button>`).join('')}</div>`+ `<div class="dk-sh">Layout slide</div><div class="dk-lay">${Object.keys(LAYOUTS).map(k=>
       `<button type="button" class="dk-lb${k===s.layout?' on':''}" data-act="lay" data-lay="${k}" aria-pressed="${k===s.layout}">${LAYOUTS[k].i}<span>${h(LAYOUTS[k].n)}</span></button>`).join('')}</div>`+
@@ -297,7 +320,7 @@ function drawAll(){
 
 /* ---------- aksi ---------- */
 function select(i){
-  st.sel=Math.min(Math.max(i,0),st.deck.slides.length-1);
+  st.sel=Math.min(Math.max(i,0),st.deck.slides.length-1);selectedObject=null;
   drawList();drawStage();drawSide();dirty();
 }
 function focusField(f,k,p){
@@ -348,9 +371,10 @@ const ACT={
   fullscreen(){const el=q('.dk-stage');if(document.fullscreenElement)document.exitFullscreen();else if(el.requestFullscreen)el.requestFullscreen()},
   zoomin(){zoom=Math.min(125,zoom+10);applyZoom()},zoomout(){zoom=Math.max(70,zoom-10);applyZoom()},
   text(){st.tab='content';drawSide();focusField('title')},
-  image(){say('Gambar bebas belum didukung di versi ini; elemen teks dan slide tetap bisa diedit')},
+  image(){const el=q('#dkImageInput');el.value='';el.click()},
   chart(){insertLayout('chart')},table(){insertLayout('table')},
-  shape(){say('Bentuk bebas belum tersedia')},icon(){say('Ikon bebas belum tersedia')},
+  shape(){showObjectPicker('shape')},icon(){showObjectPicker('icon')},
+  deleteobject(){const s=cur();s.objects=(s.objects||[]).filter(o=>o.id!==selectedObject);selectedObject=null;drawAll();dirty()},
   logo(){say('Logo JNE sudah tersedia pada tema slide')},video(){say('Video belum didukung dalam ekspor PPTX')},
   assistant(){st.tab='ai';drawSide()},contenttab(){st.tab='content';drawSide()},
 
@@ -390,11 +414,13 @@ root.addEventListener('click',e=>{
     else if(ACT[a])ACT[a]();
     return;
   }
+  const obj=e.target.closest('#dkFrame [data-obj]');if(obj){selectedObject=obj.dataset.obj;st.tab='objects';drawStage();drawSide();return}
   const f=e.target.closest('#dkFrame [data-f]');
   if(f)focusField(f.dataset.f,f.dataset.k,f.dataset.p);
 });
 /* Foto sampul: proses file, kompres agar aman untuk localStorage, lalu perbarui slide. */
 root.addEventListener('change',async e=>{
+  if(e.target.id==='dkImageInput'){const f=e.target.files&&e.target.files[0];if(f)await addSlideImage(f);return}
   if(e.target.id!=='dkCoverInput')return;
   const file=e.target.files&&e.target.files[0];
   if(!file)return;
@@ -438,6 +464,14 @@ root.addEventListener('keydown',e=>{
   }
 });
 root.addEventListener('input',e=>{
+ if(e.target.matches('[data-object-prop]')){
+  const o=(cur().objects||[]).find(x=>x.id===selectedObject);if(!o)return;
+  const prop=e.target.dataset.objectProp;
+  if(prop==='color'&&/^#[0-9a-f]{6}$/i.test(e.target.value))o.color=e.target.value;
+  else if(['x','y','w','h'].includes(prop))o[prop]=Math.max(prop==='w'||prop==='h'?2:0,Math.min(100,Number(e.target.value)||0));
+  drawStage();drawThumb(st.sel);dirty();return;
+ }
+
   const t=e.target;
   if(t.hasAttribute&&t.hasAttribute('data-name')){st.deck.name=clip(t.value,MAX_NAME);dirty();return}
   const f=t.dataset&&t.dataset.f;if(!f||!FIELDS[f]&&f!=='k')return;
@@ -534,10 +568,39 @@ async function exportPPTX(){const btn=q('[data-act="export"]');btn.disabled=true
  else if(s.layout==='table'){lines(s.body).slice(0,8).forEach((line,j)=>{const parts=line.split('|').slice(0,4);parts.forEach((part,k)=>{const x=.85+k*3.05,y=1.9+j*.59;sl.addShape(pptx.ShapeType.rect,{x,y,w:3.0,h:.55,line:{color:'375178',width:.5},fill:{color:j===0?accent:(dark?'102348':'FFFFFF')}});tx(sl,part.trim(),x+.12,y+.11,2.75,.35,13,{bold:j===0,color:j===0?'06172E':fg})})})}
  else tx(sl,lines(s.body).map(v=>'• '+v).join('\n'),1,2,11.3,4.4,23);
  }
+ (s.objects||[]).forEach(o=>{
+  const x=o.x/100*13.333,y=o.y/100*7.5,w=o.w/100*13.333,h=o.h/100*7.5,c=o.color.slice(1);
+  if(o.type==='image')sl.addImage({data:o.src,x,y,w,h});
+  else if(o.type==='icon')tx(sl,DK_ICONS[o.kind],x,y,w,h,Math.max(12,Math.min(90,h*65)),{color:c,align:'center',valign:'mid'});
+  else if(o.kind==='rect'||o.kind==='ellipse')sl.addShape(o.kind==='rect'?pptx.ShapeType.rect:pptx.ShapeType.ellipse,{x,y,w,h,line:{color:c,width:1},fill:{color:c,transparency:15}});
+  else {sl.addShape(pptx.ShapeType.line,{x,y:y+h/2,w,h:0,line:{color:c,width:3,beginArrowType:undefined,endArrowType:o.kind==='arrow'?'triangle':undefined}})}
+ });
  tx(sl,'LEGUTI  •  Operations Intelligence',.8,7.06,8,.25,9,{color:accent});tx(sl,String(i+1),12.3,7.06,.3,.25,9,{align:'right'});
  });
  const name=(st.deck.name||'LEGUTI-Deck').replace(/[\\/:*?"<>|]/g,'-').slice(0,60)+'.pptx';await pptx.writeFile({fileName:name});say('PowerPoint berhasil diekspor (teks dan bentuk dapat diedit)')
  }catch(e){console.error('[Deck Studio PPTX]',e);alert('Ekspor PPTX gagal: '+e.message)}finally{btn.disabled=false;btn.innerHTML=prev}}
+
+
+/* Editor objek manual: model tersimpan bersama slide, tidak mengubah data dashboard. */
+function addObject(data){const o=cleanObject({id:rid(),x:34,y:33,w:25,h:22,color:st.deck.accent,...data});if(!o)return say('Objek tidak valid');const s=cur();s.objects=s.objects||[];if(s.objects.length>=35)return say('Maksimal 35 objek per slide');s.objects.push(o);selectedObject=o.id;st.tab='objects';drawAll();dirty()}
+function showObjectPicker(type){
+ const options=type==='shape'?[['rect','Persegi'],['ellipse','Lingkaran'],['line','Garis'],['arrow','Panah']]:Object.keys(DK_ICONS).map(k=>[k,DK_ICONS[k]+' '+k]);
+ st.tab='objects';selectedObject=null;drawSide();const sb=q('#dkSb');sb.innerHTML=`<div class="dk-sh">Pilih ${type==='shape'?'Bentuk':'Ikon'}</div><div class="dk-object-picker">${options.map(([k,label])=>`<button type="button" data-kind="${k}">${h(label)}</button>`).join('')}</div><p class="dk-hint">Klik objek pada slide untuk memindahkan, mengubah ukuran, warna, atau menghapusnya.</p>`;
+ sb.querySelectorAll('[data-kind]').forEach(b=>b.addEventListener('click',()=>addObject({type,kind:b.dataset.kind,w:type==='icon'?12:25,h:type==='icon'?18:22})));
+}
+function drawObjectSide(){const sb=q('#dkSb'),o=(cur().objects||[]).find(x=>x.id===selectedObject);if(!o){sb.innerHTML='<div class="dk-sh">Editor Objek</div><p class="dk-hint">Pilih objek di slide atau gunakan tombol Gambar, Bentuk, Ikon.</p>';return}
+ sb.innerHTML=`<div class="dk-sh">Edit ${o.type==='image'?'Gambar':o.type==='shape'?'Bentuk':'Ikon'}</div><p class="dk-hint">Geser objek pada slide. Tarik titik kanan bawah untuk mengubah ukuran.</p>${[['x','Posisi X'],['y','Posisi Y'],['w','Lebar'],['h','Tinggi']].map(([k,label])=>`<label class="dk-fd"><span>${label} (%)</span><input type="number" min="0" max="100" step="1" data-object-prop="${k}" value="${Math.round(o[k])}"></label>`).join('')}${o.type!=='image'?`<label class="dk-fd"><span>Warna</span><input type="color" data-object-prop="color" value="${o.color}"></label>`:''}<button type="button" class="dk-side-btn" data-act="deleteobject">Hapus objek</button>`;
+}
+async function addSlideImage(file){if(!['image/jpeg','image/png'].includes(file.type)||file.size>8*1024*1024)return say('Gunakan JPG/PNG maksimal 8 MB');try{
+ const src=await new Promise((resolve,reject)=>{const img=new Image(),url=URL.createObjectURL(file);img.onload=()=>{const c=document.createElement('canvas'),scale=Math.min(1,1100/img.width,800/img.height);c.width=Math.max(1,Math.round(img.width*scale));c.height=Math.max(1,Math.round(img.height*scale));c.getContext('2d').drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(url);resolve(c.toDataURL('image/jpeg',.76))};img.onerror=()=>{URL.revokeObjectURL(url);reject(Error('Gambar gagal dibaca'))};img.src=url});
+ addObject({type:'image',src,w:32,h:32});
+ }catch(e){say(e.message)} }
+let dragObj=null;
+root.addEventListener('pointerdown',e=>{const el=e.target.closest('#dkFrame .dk-object');if(!el||e.button!==0)return;const o=(cur().objects||[]).find(x=>x.id===el.dataset.obj);if(!o)return;e.preventDefault();selectedObject=o.id;st.tab='objects';const r=q('#dkFrame .dk-s').getBoundingClientRect();dragObj={id:o.id,startX:e.clientX,startY:e.clientY,x:o.x,y:o.y,w:o.w,h:o.h,resize:!!e.target.closest('[data-resize]'),rw:r.width,rh:r.height};el.setPointerCapture(e.pointerId);drawSide();el.classList.add('selected')});
+root.addEventListener('pointermove',e=>{if(!dragObj)return;const o=(cur().objects||[]).find(x=>x.id===dragObj.id);if(!o)return;const dx=(e.clientX-dragObj.startX)/dragObj.rw*100,dy=(e.clientY-dragObj.startY)/dragObj.rh*100;if(dragObj.resize){o.w=Math.max(2,Math.min(100-o.x,dragObj.w+dx));o.h=Math.max(2,Math.min(100-o.y,dragObj.h+dy))}else{o.x=Math.max(0,Math.min(100-o.w,dragObj.x+dx));o.y=Math.max(0,Math.min(100-o.h,dragObj.y+dy))}const el=q('#dkFrame [data-obj="'+o.id+'"]');if(el){el.style.left=o.x+'%';el.style.top=o.y+'%';el.style.width=o.w+'%';el.style.height=o.h+'%'}});
+root.addEventListener('pointerup',()=>{if(!dragObj)return;dragObj=null;drawStage();drawThumb(st.sel);drawSide();dirty()});
+root.addEventListener('pointercancel',()=>{dragObj=null});
+root.addEventListener('keydown',e=>{if((e.key==='Delete'||e.key==='Backspace')&&e.target.closest('.dk-object')){e.preventDefault();ACT.deleteobject()}});
 
 /* ---------- Hybrid: adapter baca-saja terhadap state dashboard ---------- */
 const HYBRID_PERIOD_KEY='leguti_deck_period_v1';
