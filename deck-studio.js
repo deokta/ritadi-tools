@@ -386,8 +386,32 @@ function showPreview(){
  ov.onclick=e=>{const a=e.target.closest('[data-prev]')?.dataset.prev;if(a==='close'){ov.hidden=true;ov.onclick=null}else if(a==='back'){i=Math.max(0,i-1);render()}else if(a==='forward'){i=Math.min(st.deck.slides.length-1,i+1);render()}};
 }
 let pptxLoading=null;
-function loadPptx(){if(window.pptxgen)return Promise.resolve(window.pptxgen);if(pptxLoading)return pptxLoading;
- pptxLoading=new Promise((resolve,reject)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js';sc.onload=()=>window.pptxgen?resolve(window.pptxgen):reject(new Error('Pustaka PowerPoint tidak tersedia'));sc.onerror=()=>reject(new Error('Gagal memuat pustaka PowerPoint. Periksa koneksi internet.'));document.head.appendChild(sc)}).catch(e=>{pptxLoading=null;throw e});return pptxLoading}
+function getPptxConstructor(){
+  const candidates=[window.pptxgen,window.PptxGenJS,window.pptxgenjs,window.PptxGenJs];
+  for(const c of candidates){if(typeof c==='function')return c;if(c&&typeof c.default==='function')return c.default;}
+  return null;
+}
+function loadPptx(){
+  const ready=getPptxConstructor();if(ready)return Promise.resolve(ready);
+  if(pptxLoading)return pptxLoading;
+  const urls=[
+    'https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js',
+    'https://unpkg.com/pptxgenjs@3.12.0/dist/pptxgen.bundle.js'
+  ];
+  pptxLoading=new Promise((resolve,reject)=>{
+    let index=0;
+    function attempt(){
+      if(index>=urls.length){reject(new Error('Pustaka PowerPoint gagal dimuat. Periksa akses CDN di browser (Network/Console).'));return;}
+      const url=urls[index++],sc=document.createElement('script');
+      sc.src=url;sc.async=true;
+      sc.onload=()=>{const P=getPptxConstructor();if(P)resolve(P);else{console.warn('[Deck Studio] CDN loaded without PPTX global:',url);attempt();}};
+      sc.onerror=()=>{console.warn('[Deck Studio] CDN unavailable:',url);attempt();};
+      document.head.appendChild(sc);
+    }
+    attempt();
+  }).catch(e=>{pptxLoading=null;throw e});
+  return pptxLoading;
+}
 async function exportPPTX(){const btn=q('[data-act="export"]');btn.disabled=true;const prev=btn.innerHTML;btn.textContent='Membuat PPTX…';
  try{const P=await loadPptx(),pptx=new P();pptx.layout='LAYOUT_WIDE';pptx.author='LEGUTI Operations Intelligence';pptx.subject='Outbound Performance';pptx.title=st.deck.name;pptx.lang='id-ID';
  const accent=(st.deck.accent||'#12e8d8').replace('#','');const dark=st.deck.theme!=='arctic',bg=dark?(st.deck.theme==='aurora'?'150E35':'07132D'):'EFF6FF',fg=dark?'FFFFFF':'12264A';
