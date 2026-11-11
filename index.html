@@ -458,7 +458,7 @@ const{data:p,error}=await sb.from("profiles").select("id,nik,full_name,role,stat
 if(error||!p){await sb.auth.signOut();show("l");return msg("Profil tidak ditemukan")}
 if(p.status!=="approved"){await sb.auth.signOut();show("l");return msg({pending:"Akun menunggu persetujuan admin.",rejected:"Pendaftaran akun ditolak.",disabled:"Akun dinonaktifkan."}[p.status])}
 backup();try{await pull()}catch(e){await sb.auth.signOut();show("l");return msg("Gagal memuat data: "+e.message)}
-P=p;S.role=p.role;document.body.classList.toggle("ro",p.role!=="admin");
+P=p;S.role=p.role;window.S.role=p.role;document.body.classList.toggle("ro",p.role!=="admin");
 if(p.role==="admin"&&!NAV.some(n=>n[0]=="acct")){NAV.push(["acct","Manajemen Akun","Manajemen Akun"]);IC.acct=IC.users}
 $("av").textContent=ini(p.full_name);A.hidden=true;view="dash";chrome();filters();render()}
 async function acctPage(){const v=$("vx");v.innerHTML='<div class="panel pg"><div class="emp">Memuat…</div></div>';
