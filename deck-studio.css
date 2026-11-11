@@ -313,4 +313,27 @@
     margin:0;
     flex:0 0 auto;
   }
+
+/* Deck Studio: gunakan ruang layar lebih luas */
+@media (min-width: 901px) {
+  body.dk-on .hero {
+    display: none;
+  }
+
+  body.dk-on #view-deck {
+    height: calc(100dvh - 28px);
+    min-height: 560px;
+    margin-top: 0;
+  }
+
+  body.dk-on #view-deck .dk-stage {
+    justify-content: flex-start;
+  }
+
+  body.dk-on #view-deck .dk-frame {
+    margin: 0 auto;
+    width: 100%;
+    max-width: 100%;
+  }
 }
+
