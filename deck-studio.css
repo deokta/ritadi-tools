@@ -265,6 +265,58 @@
 #view-deck .dk-backgrounds{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 #view-deck .dk-backgrounds button,#view-deck .dk-side-btn{border:1px solid #355077;border-radius:9px;background:#122b50;color:#e4f2ff;padding:12px}
 #view-deck .dk-side-btn{width:100%;margin:5px 0;text-align:left}
+#view-deck .dk-object-picker{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+  margin:10px 0 14px;
+}
+
+#view-deck .dk-object-option{
+  border:1px solid #355077;
+  border-radius:12px;
+  background:linear-gradient(135deg,#122b50,#0d213f);
+  color:#eaf4ff;
+  min-height:72px;
+  padding:12px 10px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  text-align:center;
+  cursor:pointer;
+  transition:all .18s ease;
+}
+
+#view-deck .dk-object-option strong{
+  font-size:26px;
+  line-height:1;
+  color:#7ee7ff;
+  font-weight:700;
+}
+
+#view-deck .dk-object-option span{
+  font-size:12px;
+  line-height:1.25;
+  color:#eaf4ff;
+  font-weight:600;
+  word-break:break-word;
+}
+
+#view-deck .dk-object-option:hover,
+#view-deck .dk-object-option:focus-visible{
+  border-color:var(--dk-accent);
+  background:linear-gradient(135deg,#173861,#10294d);
+  transform:translateY(-1px);
+  outline:none;
+}
+
+@media(max-width:900px){
+  #view-deck .dk-object-picker{
+    grid-template-columns:1fr 1fr;
+  }
+}
 #view-deck .dk-tools{grid-area:tools;display:flex;align-items:stretch;gap:5px;padding:7px 10px;min-height:70px;overflow-x:auto}
 #view-deck .dk-tools button{min-width:60px;flex:1;border:0;border-radius:8px;background:transparent;color:#d4e2f8;display:grid;place-items:center;gap:4px;padding:6px;font-size:11px}
 #view-deck .dk-tools button:hover{background:#18365b}
@@ -387,3 +439,178 @@
 
 /* Joni AI image objects: prevent inherited opaque backgrounds without changing slide layout */
 #view-deck .dk-object:has(> img[src*="joni-ai/"]),#view-deck .dk-object > img[src*="joni-ai/"]{background:transparent!important;background-color:transparent!important;box-shadow:none}
+
+
+/* ===== LEGUTI Deck Studio: Premium Right Panel ===== */
+
+/* Panel kanan */
+#view-deck .dk-side {
+  background: linear-gradient(180deg, #0c203d, #08182f);
+  border: 1px solid #29486e;
+  border-radius: 16px;
+}
+
+/* Navigasi tab */
+#view-deck .dk-tabs {
+  background: #102541;
+  border-bottom: 1px solid #29466b;
+}
+
+#view-deck .dk-tab {
+  color: #b6cbe6;
+  transition: background .2s, color .2s;
+}
+
+#view-deck .dk-tab:hover {
+  background: #193859;
+  color: #ffffff;
+}
+
+#view-deck .dk-tab.on {
+  background: #14314e;
+  color: #22e5dc;
+  border-bottom-color: #22e5dc;
+}
+
+/* Judul bagian */
+#view-deck .dk-sb .dk-sh {
+  color: #f0f7ff;
+  font-size: 13px;
+  font-weight: 750;
+  letter-spacing: .2px;
+  margin-bottom: 12px;
+}
+
+/* Kartu pemilihan ikon dan bentuk */
+#view-deck .dk-object-picker {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 12px 0 18px;
+}
+
+#view-deck .dk-object-picker button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 0;
+  min-height: 82px;
+  padding: 12px 8px;
+  border: 1px solid #36557c;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #153253, #0b203b);
+  color: #edf6ff;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: background .2s, border-color .2s, transform .2s;
+}
+
+#view-deck .dk-object-picker button strong {
+  color: #3ee4df;
+  font-size: 28px;
+  line-height: 1.1;
+  font-weight: 700;
+}
+
+#view-deck .dk-object-picker button span {
+  color: #e1efff;
+  font-size: 12px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+#view-deck .dk-object-picker button:hover {
+  border-color: #24e0d5;
+  background: #1a4163;
+  transform: translateY(-2px);
+}
+
+#view-deck .dk-object-picker button:focus-visible {
+  outline: 2px solid #24e0d5;
+  outline-offset: 2px;
+}
+
+/* Tombol Gambar, Data, dan Editor Objek */
+#view-deck .dk-side-btn {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  border: 1px solid #35577e;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #153556, #102744);
+  color: #e8f3ff;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.4;
+  transition: background .2s, border-color .2s;
+}
+
+#view-deck .dk-side-btn:hover {
+  background: #1c466c;
+  border-color: #28dacc;
+}
+
+/* Input pengaturan objek */
+#view-deck .dk-sb .dk-fd input:not([type="color"]),
+#view-deck .dk-sb .dk-fd textarea {
+  background: #0a1d37;
+  border: 1px solid #38567d;
+  border-radius: 10px;
+  color: #eff7ff;
+}
+
+#view-deck .dk-sb .dk-fd input:focus,
+#view-deck .dk-sb .dk-fd textarea:focus {
+  border-color: #2edbd4;
+  outline: 1px solid #2edbd4;
+}
+
+/* Pemilih warna objek */
+#view-deck .dk-sb input[type="color"] {
+  min-height: 45px;
+  padding: 5px;
+  border: 1px solid #38567d;
+  background: #102541;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+/* Panel Joni AI */
+#view-deck .dk-joni-heading {
+  padding: 14px;
+  border: 1px solid #56509b;
+  border-radius: 12px;
+  background: linear-gradient(120deg, #242253, #132a50);
+  color: #f1edff;
+  font-size: 14px;
+  font-weight: 750;
+}
+
+#view-deck .dk-joni-heading .dk-joni-mark {
+  width: 36px;
+  height: 36px;
+}
+
+/* Deskripsi */
+#view-deck .dk-sb .dk-hint {
+  color: #adc3df;
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+/* Tampilan layar kecil */
+@media (max-width: 650px) {
+  #view-deck .dk-object-picker {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  #view-deck .dk-object-picker button {
+    min-height: 76px;
+  }
+}
