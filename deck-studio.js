@@ -85,6 +85,7 @@ function cleanSlide(o){
   if(typeof o.coverImage==='string' && /^data:image\/(?:jpeg|png);base64,/.test(o.coverImage) && o.coverImage.length<1400000)s.coverImage=o.coverImage;
   Object.keys(FIELDS).forEach(f=>{s[f]=clip(o[f],FIELDS[f].m)});
   if(Array.isArray(o.k))s.k=s.k.map((_,i)=>({v:clip(o.k[i]&&o.k[i].v,9),l:clip(o.k[i]&&o.k[i].l,40)}));
+  if(o.autoSource&&typeof o.autoSource==='string')s.autoSource=clip(o.autoSource,50);
   return s;
 }
 function sampleDeck(){
@@ -96,14 +97,14 @@ function sampleDeck(){
   const d=emptySlide('chart');Object.assign(d,{title:'Tren Operasional',body:'Senin: 1200\nSelasa: 1600\nRabu: 1450\nKamis: 2100\nJumat: 1850'});
   const e=emptySlide('insight');Object.assign(e,{title:'Joni AI Insight',insight:'Prioritaskan penyelesaian kendala manifest dan produktivitas.',body:'Evaluasi lane dengan backlog tertinggi\nOptimalkan alokasi petugas\nPantau tren harian'});
   const f=emptySlide('content');Object.assign(f,{title:'Action Plan',body:'Monitoring performa setiap shift\nReview hasil operasional mingguan\nTindak lanjut anomali data'});
-  return{name:'Presentasi Operasional',slides:[a,b,c,d,e,f],theme:'midnight',accent:'#12e8d8',background:'solid'};
+  return{name:'Presentasi Operasional',slides:[a,b,c,d,e,f],theme:'midnight',accent:'#12e8d8',background:'solid',syncBase:{}};
 }
 function load(k){
   try{
     const o=JSON.parse(localStorage.getItem(PFX+k));
     if(o&&o.deck&&Array.isArray(o.deck.slides)&&o.deck.slides.length){
       const slides=o.deck.slides.slice(0,MAX_SLIDES).map(cleanSlide);
-      return{deck:{name:clip(o.deck.name,MAX_NAME)||'Presentasi Operasional',slides,theme:THEMES[o.deck.theme]?o.deck.theme:'midnight',accent:/^#[0-9a-f]{6}$/i.test(o.deck.accent)?o.deck.accent:'#12e8d8',background:['solid','gradient'].includes(o.deck.background)?o.deck.background:'solid'},sel:Math.min(Math.max(+o.sel||0,0),slides.length-1),tab:'design'};
+      return{deck:{name:clip(o.deck.name,MAX_NAME)||'Presentasi Operasional',slides,theme:THEMES[o.deck.theme]?o.deck.theme:'midnight',accent:/^#[0-9a-f]{6}$/i.test(o.deck.accent)?o.deck.accent:'#12e8d8',background:['solid','gradient'].includes(o.deck.background)?o.deck.background:'solid',syncBase:o.deck.syncBase&&typeof o.deck.syncBase==='object'?o.deck.syncBase:{}},sel:Math.min(Math.max(+o.sel||0,0),slides.length-1),tab:'design'};
     }
   }catch(_){}
   return{deck:sampleDeck(),sel:0,tab:'design'};
@@ -270,7 +271,7 @@ function drawSide(){
       `<div class="dk-sh">Foto Sampul (slide judul)</div><div class="dk-cover-controls"><button type="button" class="dk-side-btn" data-act="uploadcover">＋ Pilih foto gudang / armada</button>${s.coverImage?'<button type="button" class="dk-side-btn" data-act="removecover">Hapus foto sampul</button>':''}</div><p class="dk-hint">JPG/PNG maksimal 8 MB. Foto disimpan dalam draft browser dan ikut ekspor PPTX.</p><div class="dk-sh">Latar Belakang</div><div class="dk-backgrounds"><button type="button" data-act="background" data-bg="solid" class="${st.deck.background==='solid'?'on':''}">Solid</button><button type="button" data-act="background" data-bg="gradient" class="${st.deck.background==='gradient'?'on':''}">Gradasi</button></div><p class="dk-hint">Ganti layout tanpa kehilangan isi teks.</p>`;
     return;
   }
-  if(st.tab==='data'){sb.innerHTML=`<div class="dk-sh">Data Operasional</div><p class="dk-hint">Masukkan nilai yang telah diverifikasi pada slide KPI, Grafik, atau Tabel. Sinkronisasi otomatis dengan database belum diaktifkan.</p><button type="button" class="dk-side-btn" data-act="insertkpi">＋ Slide KPI</button><button type="button" class="dk-side-btn" data-act="insertchart">＋ Slide Grafik</button><button type="button" class="dk-side-btn" data-act="inserttable">＋ Slide Tabel</button>`;return}
+  if(st.tab==='data'){sb.innerHTML=`<div class="dk-sh">Generate Hybrid · Data Asli</div><label class="dk-fd"><span>Periode</span><select id="dkPeriod"><option value="day">Harian</option><option value="week">7 hari</option><option value="month">Bulanan</option><option value="range">Rentang tanggal</option></select></label><div class="dk-period-dates"><label class="dk-fd"><span>Dari</span><input type="date" id="dkFrom"></label><label class="dk-fd"><span>Sampai</span><input type="date" id="dkTo"></label></div><button type="button" class="dk-side-btn dk-generate" data-act="generate">✦ Generate / Sinkronisasi Presentasi</button><p class="dk-hint">Data diambil saat tombol ditekan. Slide yang diedit manual tidak akan ditimpa otomatis. Data kosong ditandai belum tersedia, bukan nol.</p><div class="dk-sh">Tambah Slide Manual</div><button type="button" class="dk-side-btn" data-act="insertkpi">＋ Slide KPI</button><button type="button" class="dk-side-btn" data-act="insertchart">＋ Slide Grafik</button><button type="button" class="dk-side-btn" data-act="inserttable">＋ Slide Tabel</button>`;initHybridPeriod();return}
   if(st.tab==='ai'){sb.innerHTML=`<div class="dk-joni-heading">${JONI_MARK}<b>Joni AI Assistant</b></div><p class="dk-hint">Asisten pembuatan presentasi. Integrasi AI khusus Deck Studio belum terhubung; gunakan tab Konten untuk menyusun slide saat ini.</p><button type="button" class="dk-side-btn" data-act="contenttab">Edit konten slide</button>`;return}
   const out=[`<p class="dk-hint" style="margin:0 0 14px">Ketik di sini atau klik teks langsung pada slide.</p>`];
   LAYOUTS[s.layout].f.forEach(f=>{
@@ -343,6 +344,7 @@ const ACT={
   save(){save();say('Draft tersimpan di browser ini')},
   preview(){showPreview()},
   export(){exportPPTX()},
+  generate(){generateHybrid()},
   fullscreen(){const el=q('.dk-stage');if(document.fullscreenElement)document.exitFullscreen();else if(el.requestFullscreen)el.requestFullscreen()},
   zoomin(){zoom=Math.min(125,zoom+10);applyZoom()},zoomout(){zoom=Math.max(70,zoom-10);applyZoom()},
   text(){st.tab='content';drawSide();focusField('title')},
@@ -536,6 +538,67 @@ async function exportPPTX(){const btn=q('[data-act="export"]');btn.disabled=true
  });
  const name=(st.deck.name||'LEGUTI-Deck').replace(/[\\/:*?"<>|]/g,'-').slice(0,60)+'.pptx';await pptx.writeFile({fileName:name});say('PowerPoint berhasil diekspor (teks dan bentuk dapat diedit)')
  }catch(e){console.error('[Deck Studio PPTX]',e);alert('Ekspor PPTX gagal: '+e.message)}finally{btn.disabled=false;btn.innerHTML=prev}}
+
+/* ---------- Hybrid: adapter baca-saja terhadap state dashboard ---------- */
+const HYBRID_PERIOD_KEY='leguti_deck_period_v1';
+function isoDay(d){return new Date(d).toISOString().slice(0,10)}
+function shiftDay(d,n){const x=new Date(d+'T12:00:00Z');x.setUTCDate(x.getUTCDate()+n);return isoDay(x)}
+function initHybridPeriod(){
+ const end=q('#dkTo'),start=q('#dkFrom'),mode=q('#dkPeriod');if(!end||!start||!mode)return;
+ let pref={};try{pref=JSON.parse(localStorage.getItem(HYBRID_PERIOD_KEY)||'{}')}catch(_){}
+ const dates=[...(typeof data!=='undefined'&&Array.isArray(data)?data:[]),...(typeof userData!=='undefined'&&Array.isArray(userData)?userData:[])].map(x=>x.date).filter(x=>/^\d{4}-\d{2}-\d{2}$/.test(x));
+ const last=dates.sort().pop()||isoDay(new Date());mode.value=['day','week','month','range'].includes(pref.mode)?pref.mode:'week';end.value=pref.end||last;start.value=pref.start||shiftDay(end.value,-6);
+ const update=()=>{if(mode.value==='day')start.value=end.value;else if(mode.value==='week')start.value=shiftDay(end.value,-6);else if(mode.value==='month')start.value=end.value.slice(0,7)+'-01';try{localStorage.setItem(HYBRID_PERIOD_KEY,JSON.stringify({mode:mode.value,start:start.value,end:end.value}))}catch(_){}};
+ mode.addEventListener('change',update);end.addEventListener('change',update);start.addEventListener('change',()=>{if(mode.value!=='range')mode.value='range';update()});update();
+}
+function hybridRead(from,to){
+ const within=(r,k='date')=>r&&typeof r[k]==='string'&&r[k]>=from&&r[k]<=to;
+ const inbound=typeof data!=='undefined'&&Array.isArray(data)?data.filter(r=>within(r)&&r.hub==='LEGUTI'):[];
+ const users=typeof userData!=='undefined'&&Array.isArray(userData)?userData.filter(r=>within(r)):[];
+ const ps8=typeof opsData!=='undefined'&&Array.isArray(opsData.ps8)?opsData.ps8.filter(r=>within(r)):[];
+ const pdt=typeof pdtItems!=='undefined'&&Array.isArray(pdtItems)?pdtItems.filter(r=>within(r,'process_date')):[];
+ const legacyPdt=typeof opsData!=='undefined'&&Array.isArray(opsData.pdt)?opsData.pdt.filter(r=>within(r)):[];
+ const sum=(rows,k)=>rows.reduce((n,r)=>n+(Number(r[k])||0),0);
+ const byDay=new Map();inbound.forEach(r=>{const v=byDay.get(r.date)||{date:r.date,awb:0,h0:0};v.awb+=Number(r.awb)||0;v.h0+=Number(r.h0)||0;byDay.set(r.date,v)});
+ const group=(rows,key,val)=>{const m=new Map();rows.forEach(r=>m.set(String(r[key]||'Tidak diketahui'),(m.get(String(r[key]||'Tidak diketahui'))||0)+(Number(r[val])||0)));return [...m].sort((a,b)=>b[1]-a[1])};
+ const pdtCount=pdt.length?pdt.filter(r=>String(r.manifest_status||'').toUpperCase().includes('PS8')||String(r.manifest_status||'').toUpperCase().includes('LOLOS MANIFEST')).length:(legacyPdt.length?sum(legacyPdt,'count'):null);
+ return{from,to,inbound,users,ps8,pdt,legacyPdt,byDay:[...byDay.values()].sort((a,b)=>a.date.localeCompare(b.date)),total:sum(inbound,'awb'),completed:sum(inbound,'h0'),ps8Total:sum(ps8,'count'),userTotal:sum(users,'awb'),pdtCount,byUser:group(users,'user','awb'),byLine:group(users,'line','awb'),days:new Set(inbound.map(r=>r.date)).size,ps8Days:new Set(ps8.map(r=>r.date)).size};
+}
+function hybridSlides(d){
+ const out=[],fmtN=n=>Number(n).toLocaleString('id-ID'),mk=(source,layout,values)=>{const s=emptySlide(layout);Object.assign(s,values,{autoSource:source});out.push(s)};
+ const period=d.from===d.to?d.from:d.from+' s.d. '+d.to;
+ mk('cover','title',{kicker:'OPERATIONS INTELLIGENCE',title:'LEGUTI Outbound Performance',subtitle:'Laporan operasional berbasis data dashboard',meta:period});
+ mk('summary','content',{title:'Ringkasan Eksekutif',body:[`Periode: ${period}`,`Data barang masuk: ${d.days} tanggal tercatat`,d.inbound.length?`Total AWB: ${fmtN(d.total)}`:'Total AWB: belum tersedia',d.users.length?`Produktivitas user: ${fmtN(d.userTotal)} AWB`:'Produktivitas user: belum tersedia',d.ps8.length?`PS8 lolos manifest: ${fmtN(d.ps8Total)}`:'PS8: belum tersedia',d.pdtCount!==null?`Keylogger PDT lolos manifest: ${fmtN(d.pdtCount)}`:'Keylogger PDT: belum tersedia'].join('\n')});
+ mk('kpi','kpi',{title:'KPI Dashboard & Data Harian',subtitle:'AWB dan indikator '+(typeof ind!=='undefined'?ind:'H+1')+' dari sumber dashboard; tidak dicampur dengan produktivitas user.',k:[{v:d.inbound.length?fmtN(d.total):'—',l:'Jumlah AWB'},{v:d.inbound.length?fmtN(d.completed):'—',l:typeof ind!=='undefined'?ind:'H+1'},{v:d.inbound.length&&d.total?((d.completed/d.total)*100).toFixed(1)+'%':'—',l:'Rasio indikator'},{v:d.inbound.length?String(d.days):'—',l:'Tanggal tercatat'}]});
+ if(d.byDay.length)mk('trend','chart',{title:'Tren Jumlah AWB Harian',body:d.byDay.slice(-7).map(r=>r.date+': '+r.awb).join('\n')});
+ if(d.byUser.length)mk('users','table',{title:'Produktivitas User · Top 7',body:['User | Jumlah AWB',...d.byUser.slice(0,7).map(([k,v])=>k+' | '+fmtN(v))].join('\n')});
+ if(d.byLine.length)mk('lanes','table',{title:'Produktivitas per Lane',body:['Lane | Jumlah AWB',...d.byLine.slice(0,7).map(([k,v])=>k+' | '+fmtN(v))].join('\n')});
+ mk('manifest','kpi',{title:'PS8 & Mirroring PDT',subtitle:'Keylogger merupakan subset manifest; kedua angka tidak dijumlahkan.',k:[{v:d.ps8.length?fmtN(d.ps8Total):'—',l:'PS8 Lolos Manifest'},{v:d.pdtCount!==null?fmtN(d.pdtCount):'—',l:'Keylogger PDT'},{v:d.ps8.length?String(d.ps8Days):'—',l:'Tanggal PS8'},{v:d.inbound.length?String(d.days):'—',l:'Tanggal AWB'}]});
+ const notes=[];
+ if(d.inbound.length&&d.byDay.length>1){const first=d.byDay[0],last=d.byDay[d.byDay.length-1];notes.push(`AWB ${last.date} ${last.awb>first.awb?'lebih tinggi':last.awb<first.awb?'lebih rendah':'sama'} dibanding ${first.date} (${fmtN(last.awb)} vs ${fmtN(first.awb)})`)}
+ if(d.inbound.length&&d.ps8.length&&d.ps8Days<d.days)notes.push(`Cakupan tanggal PS8 (${d.ps8Days}) lebih sedikit daripada data AWB (${d.days}); hindari kesimpulan rasio gabungan`);
+ if(d.byLine.length)notes.push(`Lane produktivitas terbesar: ${d.byLine[0][0]} (${fmtN(d.byLine[0][1])} AWB)`);
+ if(!notes.length)notes.push('Belum cukup data terverifikasi untuk menyimpulkan tren operasional');
+ mk('insights','insight',{title:'Analisis Gabungan & Insight',insight:'Ringkasan deskriptif berdasarkan data yang tersedia; bukan hasil prediksi.',body:notes.join('\n')});
+ const actions=[];if(d.ps8Days<d.days)actions.push('Lengkapi tanggal PS8 yang belum tercatat sebelum menghitung rasio');if(!d.users.length)actions.push('Periksa ketersediaan data Produktivitas User');if(d.pdtCount===null)actions.push('Muat data Mirroring PDT dari sumber operasional');if(d.byLine.length)actions.push('Tinjau distribusi beban kerja antar-lane berdasarkan rekap produktivitas');if(!actions.length)actions.push('Lakukan validasi silang data AWB, PS8, dan PDT sebelum laporan final');
+ mk('actions','content',{title:'Action Plan · Rekomendasi Pemeriksaan',body:actions.join('\n')});
+ return out;
+}
+function generateHybrid(){
+ const from=q('#dkFrom')?.value,to=q('#dkTo')?.value;
+ if(!from||!to||from>to){alert('Periksa rentang tanggal.');return}
+ const source=hybridRead(from,to);if(!source.inbound.length&&!source.users.length&&!source.ps8.length&&source.pdtCount===null){alert('Tidak ada data operasional pada periode ini. Presentasi tidak diubah.');return}
+ const generated=hybridSlides(source),base=st.deck.syncBase||{},old=st.deck.slides;
+ const edited=old.filter(s=>s.autoSource&&base[s.autoSource]&&JSON.stringify(cleanSlide(s))!==base[s.autoSource]);
+ if(edited.length&&!confirm(edited.length+' slide otomatis sudah diedit manual. Pilih OK untuk MEMPERTAHANKAN perubahan manual tersebut dan memperbarui slide otomatis lainnya; Batal untuk tidak mengubah apa pun.'))return;
+ const manual=old.filter(s=>!s.autoSource||edited.includes(s));
+ const selected=new Map(old.filter(s=>s.autoSource).map(s=>[s.autoSource,s]));
+ const next=generated.map(s=>{const prev=selected.get(s.autoSource);if(prev&&edited.includes(prev))return prev;if(prev&&s.autoSource==='cover'&&prev.coverImage)s.coverImage=prev.coverImage;return s});
+ if(next.length+manual.filter(s=>!s.autoSource).length>MAX_SLIDES){alert('Batas '+MAX_SLIDES+' slide terlampaui. Kurangi slide manual terlebih dahulu.');return}
+ if(!confirm('Generate '+generated.length+' slide dari data '+from+' s.d. '+to+'? Slide manual tetap dipertahankan dan slide otomatis yang belum diedit diperbarui.'))return;
+ const newBase={...base};generated.forEach(s=>{if(!edited.some(x=>x.autoSource===s.autoSource))newBase[s.autoSource]=JSON.stringify(cleanSlide(next.find(x=>x.autoSource===s.autoSource)||s))});
+ st.deck.slides=[...next,...manual.filter(s=>!s.autoSource)];st.deck.syncBase=newBase;st.sel=0;drawAll();dirty();say('Presentasi Hybrid diperbarui; slide manual dipertahankan');
+}
 
 /* ---------- integrasi ke dashboard (tanpa mengubah fitur yang ada) ---------- */
 // Item menu baru, ditempatkan sebelum "Pengaturan".
