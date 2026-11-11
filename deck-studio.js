@@ -433,12 +433,47 @@ root.addEventListener('input',e=>{
 });
 
 /* ---------- preview & ekspor editable PPTX ---------- */
+/* ---------- animasi presentasi + suara (Preview dan Fullscreen) ---------- */
+const DK_MOTION_CSS=`
+/* Executive motion: understated dissolve, subtle lift, precise stagger */
+#view-deck .dk-present-motion .dk-s{animation:dkExecutiveSlide .78s cubic-bezier(.22,1,.36,1) both;backface-visibility:hidden}
+#view-deck .dk-present-motion .dk-brand,#view-deck .dk-present-motion .dk-kick{animation:dkExecutiveText .68s cubic-bezier(.22,1,.36,1) .17s both}
+#view-deck .dk-present-motion .dk-hd,#view-deck .dk-present-motion .dk-ti{animation:dkExecutiveText .82s cubic-bezier(.22,1,.36,1) .27s both}
+#view-deck .dk-present-motion .dk-bar2,#view-deck .dk-present-motion .dk-hd + .dk-ul{animation:dkExecutiveText .7s cubic-bezier(.22,1,.36,1) .39s both}
+#view-deck .dk-present-motion .dk-sub,#view-deck .dk-present-motion .dk-meta,#view-deck .dk-present-motion .dk-ul,#view-deck .dk-present-motion .dk-kpis,#view-deck .dk-present-motion .dk-chart,#view-deck .dk-present-motion .dk-table,#view-deck .dk-present-motion .dk-cols,#view-deck .dk-present-motion .dk-ins{animation:dkExecutiveText .75s cubic-bezier(.22,1,.36,1) .46s both}
+#view-deck .dk-present-motion .dk-kpi{animation:dkExecutiveText .65s cubic-bezier(.22,1,.36,1) both}
+#view-deck .dk-present-motion .dk-kpi:nth-child(1){animation-delay:.43s}
+#view-deck .dk-present-motion .dk-kpi:nth-child(2){animation-delay:.50s}
+#view-deck .dk-present-motion .dk-kpi:nth-child(3){animation-delay:.57s}
+#view-deck .dk-present-motion .dk-kpi:nth-child(4){animation-delay:.64s}
+@keyframes dkExecutiveSlide{from{opacity:0;transform:translate3d(0,8px,0) scale(.992)}to{opacity:1;transform:translate3d(0,0,0) scale(1)}}
+@keyframes dkExecutiveText{from{opacity:0;transform:translate3d(0,10px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+#view-deck .dk-sound-toggle{border:1px solid rgba(137,173,208,.35);border-radius:9px;background:rgba(16,43,80,.88);color:#e8f2ff;padding:8px 12px;cursor:pointer;font:inherit;transition:background .2s ease,border-color .2s ease}
+#view-deck .dk-sound-toggle:hover{background:#173a63;border-color:rgba(18,232,216,.6)}
+#view-deck .dk-sound-toggle:focus-visible{outline:2px solid #12e8d8;outline-offset:2px}
+#view-deck .dk-fullsound{position:absolute;z-index:30;top:12px;right:12px}
+#view-deck .dk-stage:fullscreen{position:relative;display:flex;align-items:center;justify-content:center;background:#061126;padding:50px 30px}
+#view-deck .dk-stage:fullscreen .dk-frame{width:min(100%,calc((100vh - 125px)*16/9));max-width:1500px;transform:none!important}
+@media(prefers-reduced-motion:reduce){#view-deck .dk-present-motion .dk-s,#view-deck .dk-present-motion .dk-s *{animation:none!important;transition:none!important}}
+`;
+const dkStyle=document.createElement('style');dkStyle.textContent=DK_MOTION_CSS;document.head.appendChild(dkStyle);
+let dkSoundOn=false,dkAudio=null;
+try{dkSoundOn=localStorage.getItem('leguti_deck_sound')==='on'}catch(_){}
+function dkSoundLabel(){return dkSoundOn?'🔊 Suara ON':'🔇 Suara OFF'}
+function dkToggleSound(){dkSoundOn=!dkSoundOn;try{localStorage.setItem('leguti_deck_sound',dkSoundOn?'on':'off')}catch(_){};root.querySelectorAll('.dk-sound-toggle').forEach(x=>x.textContent=dkSoundLabel());if(dkSoundOn)dkPlaySound()}
+function dkPlaySound(){if(!dkSoundOn)return;try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;dkAudio=dkAudio||new AC();if(dkAudio.state==='suspended')dkAudio.resume().catch(()=>{});const osc=dkAudio.createOscillator(),gain=dkAudio.createGain(),now=dkAudio.currentTime;osc.type='sine';osc.frequency.setValueAtTime(520,now);osc.frequency.exponentialRampToValueAtTime(650,now+.11);gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(.014,now+.025);gain.gain.exponentialRampToValueAtTime(.0001,now+.18);osc.connect(gain);gain.connect(dkAudio.destination);osc.start(now);osc.stop(now+.19)}catch(_){}}
+function dkAnimate(el){if(!el)return;el.classList.remove('dk-present-motion');void el.offsetWidth;el.classList.add('dk-present-motion')}
+let dkFullscreenIndex=0;
+function dkFullControls(){const stage=q('.dk-stage');if(!stage)return;let btn=stage.querySelector('.dk-fullsound');if(!btn){btn=document.createElement('button');btn.type='button';btn.className='dk-sound-toggle dk-fullsound';btn.addEventListener('click',dkToggleSound);stage.appendChild(btn)}btn.textContent=dkSoundLabel()}
+document.addEventListener('fullscreenchange',()=>{const stage=q('.dk-stage');if(!stage)return;if(document.fullscreenElement===stage){dkFullscreenIndex=st.sel;dkFullControls();dkAnimate(q('#dkFrame'));dkPlaySound()}else{q('#dkFrame')?.classList.remove('dk-present-motion');stage.querySelector('.dk-fullsound')?.remove()}});
+root.addEventListener('click',e=>{if(document.fullscreenElement!==q('.dk-stage'))return;const act=e.target.closest('[data-act]')?.dataset.act;if(act==='next'||act==='prev'){dkAnimate(q('#dkFrame'));dkPlaySound()}});
 function showPreview(){
  const ov=q('#dkOverlay');let i=st.sel;
- function render(){ov.innerHTML=`<div class="dk-preview-top"><b>${h(st.deck.name)}</b><span>Slide ${i+1} / ${st.deck.slides.length}</span><button type="button" data-prev="close">✕ Tutup</button></div><div class="dk-preview-slide">${slideHTML(st.deck.slides[i],i+1,false)}</div><div class="dk-preview-bottom"><button type="button" data-prev="back">← Sebelumnya</button><button type="button" data-prev="forward">Berikutnya →</button></div>`;ov.querySelector('.dk-preview-slide').style.setProperty('--dk-accent',st.deck.accent);ov.querySelector('.dk-preview-slide').dataset.theme=st.deck.theme}
- ov.hidden=false;render();
- ov.onclick=e=>{const a=e.target.closest('[data-prev]')?.dataset.prev;if(a==='close'){ov.hidden=true;ov.onclick=null}else if(a==='back'){i=Math.max(0,i-1);render()}else if(a==='forward'){i=Math.min(st.deck.slides.length-1,i+1);render()}};
+ function render(){ov.innerHTML=`<div class="dk-preview-top"><b>${h(st.deck.name)}</b><span>Slide ${i+1} / ${st.deck.slides.length}</span><button type="button" class="dk-sound-toggle" data-prev="sound">${dkSoundLabel()}</button><button type="button" data-prev="close">✕ Tutup</button></div><div class="dk-preview-slide">${slideHTML(st.deck.slides[i],i+1,false)}</div><div class="dk-preview-bottom"><button type="button" data-prev="back">← Sebelumnya</button><button type="button" data-prev="forward">Berikutnya →</button></div>`;const preview=ov.querySelector('.dk-preview-slide');preview.style.setProperty('--dk-accent',st.deck.accent);preview.dataset.theme=st.deck.theme;dkAnimate(preview)}
+ ov.hidden=false;render();dkPlaySound();
+ ov.onclick=e=>{const a=e.target.closest('[data-prev]')?.dataset.prev;if(a==='close'){ov.hidden=true;ov.onclick=null}else if(a==='sound'){dkToggleSound()}else if(a==='back'&&i>0){i--;render();dkPlaySound()}else if(a==='forward'&&i<st.deck.slides.length-1){i++;render();dkPlaySound()}};
 }
+
 let pptxLoading=null;
 function getPptxConstructor(){
   const candidates=[window.pptxgen,window.PptxGenJS,window.pptxgenjs,window.PptxGenJs];
