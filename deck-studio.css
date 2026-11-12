@@ -1425,3 +1425,206 @@
   color:#ff647c;
   font-weight:800;
 }
+
+
+/* ==========================================
+   LEGUTI DECK STUDIO — EXCLUSIVE THEMES
+   Hanya memengaruhi presentasi, bukan dashboard
+   ========================================== */
+
+#view-deck{
+  --deck-bg:linear-gradient(125deg,#020b25,#0b345d,#091c51);
+  --deck-ink:#f1f7ff;
+}
+
+/* Tema premium memakai background pilihan aktif */
+#view-deck .dk-s.dk-rpt,
+#view-deck .dk-s.dk-hybrid-premium{
+  background:var(--deck-bg) !important;
+  color:var(--deck-ink);
+  transition:background .35s ease;
+}
+
+/* Palet warna: garis, kartu dan panel */
+#view-deck .dk-rpt .dk-rpt-table-card,
+#view-deck .dk-rpt .dk-rpt-line-card,
+#view-deck .dk-rpt .dk-rpt-chart-card,
+#view-deck .dk-rpt .dk-daily-chart,
+#view-deck .dk-rpt .dk-rpt-insight-box,
+#view-deck .dk-rpt .dk-rpt-rekom-box{
+  border-color:color-mix(in srgb,var(--dk-accent) 65%,#ffffff 10%);
+  box-shadow:0 0 2cqw color-mix(in srgb,var(--dk-accent) 18%,transparent);
+}
+
+#view-deck .dk-rpt .dk-rpt-kicker,
+#view-deck .dk-rpt .dk-rpt-kpi-delta,
+#view-deck .dk-rpt .dk-rpt-line-pct{
+  color:var(--dk-accent);
+}
+
+#view-deck .dk-rpt .dk-rpt-h1{
+  border-bottom-color:var(--dk-accent);
+}
+
+#view-deck .dk-rpt .dk-rpt-line-bar{
+  background:linear-gradient(90deg,var(--dk-accent),#508bff);
+}
+
+#view-deck .dk-rpt .dk-daily-bar.awb{
+  background:linear-gradient(180deg,
+    color-mix(in srgb,var(--dk-accent) 55%,white),
+    var(--dk-accent));
+}
+
+#view-deck .dk-rpt .dk-rpt-kpi-card{
+  border-color:var(--dk-accent);
+}
+
+/* Tema 1 — Midnight */
+#view-deck[data-deck-theme="midnight"]{
+  --deck-bg:
+    radial-gradient(ellipse at 92% 12%,#115a87,transparent 58%),
+    linear-gradient(125deg,#020a20,#082651,#04102c);
+}
+
+/* Tema 2 — Arctic */
+#view-deck[data-deck-theme="arctic"]{
+  --deck-bg:
+    linear-gradient(135deg,
+      rgba(179,225,255,.22) 0 16%,
+      transparent 16% 72%,
+      rgba(185,231,255,.22) 72% 100%),
+    linear-gradient(130deg,#193c67,#356ca9,#8ab9e8);
+}
+
+#view-deck[data-deck-theme="arctic"] .dk-rpt-bg{
+  background:
+    linear-gradient(120deg,transparent 65%,rgba(255,255,255,.32) 65% 70%,transparent 70%);
+}
+
+/* Tema 3 — Aurora */
+#view-deck[data-deck-theme="aurora"]{
+  --deck-bg:
+    radial-gradient(ellipse at 88% 8%,#8c33c6,transparent 62%),
+    radial-gradient(ellipse at 3% 99%,#313caa,transparent 55%),
+    linear-gradient(120deg,#100927,#21104e,#090d2c);
+}
+
+/* Tema 4 — Cyberpunk */
+#view-deck[data-deck-theme="cyberpunk"]{
+  --deck-bg:
+    linear-gradient(115deg,
+      transparent 0 49%,
+      rgba(255,49,192,.22) 49% 52%,
+      transparent 52% 76%,
+      rgba(24,228,255,.2) 76% 79%,
+      transparent 79%),
+    radial-gradient(ellipse at 80% 20%,#69227e,transparent 65%),
+    linear-gradient(130deg,#07071d,#210c4b,#091d37);
+}
+
+#view-deck[data-deck-theme="cyberpunk"] .dk-rpt-bg{
+  background:
+    repeating-linear-gradient(0deg,
+      transparent 0 4cqw,
+      rgba(255,64,214,.09) 4cqw 4.08cqw),
+    linear-gradient(125deg,transparent 60%,rgba(19,226,255,.16) 61%,transparent 64%);
+}
+
+/* Tema 5 — Quantum */
+#view-deck[data-deck-theme="quantum"]{
+  --deck-bg:
+    radial-gradient(ellipse at 96% 0%,#0d6e67,transparent 60%),
+    linear-gradient(135deg,#020c16,#063037,#041e2d);
+}
+
+#view-deck[data-deck-theme="quantum"] .dk-rpt-bg{
+  background-image:
+    linear-gradient(rgba(24,233,171,.09) .08cqw,transparent .08cqw),
+    linear-gradient(90deg,rgba(24,233,171,.09) .08cqw,transparent .08cqw);
+  background-size:5cqw 5cqw;
+}
+
+/* Tema 6 — Velocity */
+#view-deck[data-deck-theme="velocity"]{
+  --deck-bg:
+    linear-gradient(119deg,
+      transparent 53%,
+      rgba(255,152,67,.22) 53% 58%,
+      transparent 58% 69%,
+      rgba(34,139,255,.26) 69% 77%,
+      transparent 77%),
+    linear-gradient(130deg,#050d25,#133c86,#06142e);
+}
+
+#view-deck[data-deck-theme="velocity"] .dk-rpt-bg{
+  background:
+    repeating-linear-gradient(115deg,
+      transparent 0 13cqw,
+      rgba(255,155,71,.08) 13cqw 13.4cqw);
+}
+
+/* Tampilan pilihan tema */
+#view-deck .dk-themes{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:9px;
+}
+
+#view-deck .dk-theme{
+  transition:transform .2s ease,
+             border-color .2s ease,
+             box-shadow .2s ease;
+}
+
+#view-deck .dk-theme:hover{
+  transform:translateY(-3px);
+  border-color:var(--dk-accent);
+  box-shadow:0 6px 18px rgba(0,0,0,.24);
+}
+
+#view-deck .dk-theme.cyberpunk i{
+  background:linear-gradient(125deg,#10052f,#e32cbd 60%,#17dfff);
+}
+
+#view-deck .dk-theme.quantum i{
+  background:linear-gradient(135deg,#03151d,#087969,#1ce5aa);
+}
+
+#view-deck .dk-theme.velocity i{
+  background:linear-gradient(125deg,#07132d,#2559ac 55%,#ff9845);
+}
+
+/* Interaksi kartu dalam editor dan preview */
+#view-deck .dk-rpt-kpi-card,
+#view-deck .dk-rpt-table-card,
+#view-deck .dk-rpt-insight-box,
+#view-deck .dk-rpt-rekom-box{
+  transition:transform .25s ease,
+             box-shadow .25s ease;
+}
+
+#view-deck .dk-rpt-kpi-card:hover{
+  transform:translateY(-.7cqw);
+  box-shadow:0 0 2.4cqw color-mix(in srgb,var(--dk-accent) 35%,transparent);
+}
+
+/* Efek hidup untuk aksen background */
+@keyframes dkThemePulse{
+  0%,100%{opacity:.65}
+  50%{opacity:1}
+}
+
+#view-deck .dk-rpt .dk-rpt-bg{
+  animation:dkThemePulse 5s ease-in-out infinite;
+}
+
+/* Aksesibilitas */
+@media(prefers-reduced-motion:reduce){
+  #view-deck .dk-rpt .dk-rpt-bg{
+    animation:none;
+  }
+  #view-deck .dk-rpt-kpi-card,
+  #view-deck .dk-theme{
+    transition:none;
+  }
+}
