@@ -307,9 +307,8 @@ const joniImage = JONI_ART[s.joni]
        draggable="false">`
   : '';
 
-return `<div class="dk-s dk-L-${LAYOUTS[s.layout]?s.layout:'content'} dk-template-${Math.min(n,6)}${s.joni?' dk-has-joni':''}${edit?' dk-e':''}">${b}${joniImage}${objectHTML(s,edit)}</div>`;
+return `<div class="dk-s dk-L-${LAYOUTS[s.layout]?s.layout:'content'} dk-template-${Math.min(n,6)}${s.autoSource?' dk-hybrid-premium':''}${s.joni?' dk-has-joni':''}${edit?' dk-e':''}">${b}${joniImage}${objectHTML(s,edit)}</div>`;
 }
-
 /* Template premium khusus enam slide Joni */
 function slideHTML(s,n,edit){
   const template=['cover','summary','kpi','trend','line','insight'].includes(s.autoSource)?s.autoSource:null;
@@ -969,7 +968,30 @@ function hybridRead(from,to){
  return{from,to,inbound,users,ps8,pdt,legacyPdt,byDay:[...byDay.values()].sort((a,b)=>a.date.localeCompare(b.date)),total:sum(inbound,'awb'),completed:sum(inbound,'h0'),ps8Total:sum(ps8,'count'),userTotal:sum(users,'awb'),pdtCount,byUser:group(users,'user','awb'),byLine:group(users,'line','awb'),days:new Set(inbound.map(r=>r.date)).size,ps8Days:new Set(ps8.map(r=>r.date)).size};
 }
 function hybridSlides(d){
- const out=[],fmtN=n=>Number(n).toLocaleString('id-ID'),mk=(source,layout,values)=>{const s=emptySlide(layout);Object.assign(s,values,{autoSource:source});out.push(s)};
+ 
+const out=[];
+const fmtN=n=>Number(n).toLocaleString('id-ID');
+
+const HYBRID_JONI={
+  cover:'original',
+  summary:'presentasi',
+  kpi:'analisis',
+  trend:'grafik',
+  users:'presentasi',
+  lanes:'analisis',
+  manifest:'grafik',
+  insights:'analisis',
+  actions:'rekomendasi'
+};
+
+const mk=(source,layout,values)=>{
+  const s=emptySlide(layout);
+  Object.assign(s,values,{
+    autoSource:source,
+    joni:HYBRID_JONI[source]||'original'
+  });
+  out.push(s);
+};
  const period=d.from===d.to?d.from:d.from+' s.d. '+d.to;
  mk('cover','title',{kicker:'OPERATIONS INTELLIGENCE',title:'LEGUTI Outbound Performance',subtitle:'Laporan operasional berbasis data dashboard',meta:period});
  mk('summary','content',{title:'Ringkasan Eksekutif',body:[`Periode: ${period}`,`Data barang masuk: ${d.days} tanggal tercatat`,d.inbound.length?`Total AWB: ${fmtN(d.total)}`:'Total AWB: belum tersedia',d.users.length?`Produktivitas user: ${fmtN(d.userTotal)} AWB`:'Produktivitas user: belum tersedia',d.ps8.length?`PS8 lolos manifest: ${fmtN(d.ps8Total)}`:'PS8: belum tersedia',d.pdtCount!==null?`Keylogger PDT lolos manifest: ${fmtN(d.pdtCount)}`:'Keylogger PDT: belum tersedia'].join('\n')});
