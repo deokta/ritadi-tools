@@ -984,12 +984,61 @@ const HYBRID_JONI={
   actions:'rekomendasi'
 };
 
+
 const mk=(source,layout,values)=>{
   const s=emptySlide(layout);
+
   Object.assign(s,values,{
     autoSource:source,
     joni:HYBRID_JONI[source]||'original'
   });
+
+  // Slide 2: Ringkasan Eksekutif
+  // Mengisi empat kartu dari data asli.
+  if(source==='summary'){
+    s.layout='kpi';
+    s.subtitle='Ringkasan operasional periode '+period;
+
+    s.k=[
+      {
+        v:d.inbound.length?fmtN(d.total):'—',
+        l:'Total AWB'
+      },
+      {
+        v:d.ps8.length?fmtN(d.ps8Total):'—',
+        l:'PS8 (Lolos Manifest)'
+      },
+      {
+        v:d.pdtCount!==null?fmtN(d.pdtCount):'—',
+        l:'Keylogger (PDT)'
+      },
+      {
+        v:d.users.length?fmtN(d.userTotal):'—',
+        l:'Produktivitas User'
+      }
+    ];
+  }
+
+  // Slide 3 dan slide PS8/PDT:
+  // Mengubah data metrik menjadi baris tabel premium.
+  if(source==='kpi'||source==='manifest'){
+    s.layout='kpi';
+
+    s.body=(s.k||[]).map(k=>{
+      const indikator=String(k.l||'Indikator');
+      const capaian=String(k.v||'—');
+
+      // Target dan perubahan belum tersedia
+      // dari data sumber, sehingga tidak dikarang.
+      return [
+        indikator,
+        capaian,
+        '—',
+        '—'
+      ].join('|');
+    }).join('\n');
+  }
+
   out.push(s);
 };
  const period=d.from===d.to?d.from:d.from+' s.d. '+d.to;
