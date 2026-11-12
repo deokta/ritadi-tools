@@ -140,7 +140,7 @@ function sampleDeck(){
   const a=emptySlide('title');
   Object.assign(a,{
     autoSource:'cover',
-    joni:'cover',
+    joni:'original',
     kicker:'MONTHLY OPERATIONS REVIEW',
     title:'Outbound Performance Report',
     subtitle:'Intelligence-driven operational reporting',
@@ -150,7 +150,7 @@ function sampleDeck(){
   const b=emptySlide('kpi');
   Object.assign(b,{
     autoSource:'summary',
-    joni:'summary',
+    joni:'presentasi',
     title:'Executive Summary',
     subtitle:'Ringkasan utama performa outbound pada periode November 2026.',
     k:[
@@ -164,7 +164,7 @@ function sampleDeck(){
   const c=emptySlide('table');
   Object.assign(c,{
     autoSource:'kpi',
-    joni:'kpi',
+    joni:'analisis',
     title:'KPI Performance',
     subtitle:'Capaian utama operasional outbound.',
     body:[
@@ -178,7 +178,7 @@ function sampleDeck(){
   const d=emptySlide('chart');
   Object.assign(d,{
     autoSource:'trend',
-    joni:'trend',
+    joni:'grafik',
     title:'Tren Operasional',
     subtitle:'Perkembangan volume AWB dan PS8 (Lolos Manifest).',
     body:[
@@ -192,7 +192,7 @@ function sampleDeck(){
   const e=emptySlide('table');
   Object.assign(e,{
     autoSource:'line',
-    joni:'line',
+    joni:'analisis',
     title:'Analisis per LINE',
     subtitle:'Kontribusi volume AWB berdasarkan LINE tujuan.',
     body:[
@@ -207,7 +207,7 @@ function sampleDeck(){
   const f=emptySlide('insight');
   Object.assign(f,{
     autoSource:'insight',
-    joni:'insight',
+    joni:'rekomendasi',
     title:'Insight & Rekomendasi',
     insight:'Performa outbound meningkat signifikan, dengan akurasi manifest mencapai 96,1%.',
     body:[
@@ -263,7 +263,7 @@ function dirty(){
 const flush=()=>{if(pending)save()};
 
 /* ---------- tampilan slide ---------- */
-function slideHTML(s,n,edit){
+function legacySlideHTML(s,n,edit){
   const T=(f,cls)=>{
     const v=s[f]||'';if(!v&&!edit)return'';
     return`<div class="${cls}${!v?' dk-ph':''}"${edit?` data-f="${f}" tabindex="0"`:''}>${h(v||(edit?FIELDS[f].p:''))}</div>`;
@@ -310,6 +310,152 @@ const joniImage = JONI_ART[s.joni]
 return `<div class="dk-s dk-L-${LAYOUTS[s.layout]?s.layout:'content'} dk-template-${Math.min(n,6)}${s.joni?' dk-has-joni':''}${edit?' dk-e':''}">${b}${joniImage}${objectHTML(s,edit)}</div>`;
 }
 
+/* Template premium khusus enam slide Joni */
+function slideHTML(s,n,edit){
+  const template=['cover','summary','kpi','trend','line','insight'].includes(s.autoSource)?s.autoSource:null;
+  if(!template)return legacySlideHTML(s,n,edit);
+
+  const T=(f,cls)=>{
+    const v=s[f]||'';
+    return `<div class="${cls}${v?'':' dk-ph'}"${edit?` data-f="${f}" tabindex="0"`:''}>${h(v||(edit&&FIELDS[f]?FIELDS[f].p:''))}</div>`;
+  };
+
+  const joni=JONI_ART[s.joni]
+    ? `<img class="dk-template-joni is-${h(s.joni)}" src="${JONI_ART[s.joni]}" alt="Joni LEGUTI" draggable="false">`
+    : '';
+
+  const rows=lines(s.body).map(x=>x.split('|').map(v=>v.trim()));
+  const parseNumber=v=>Number(String(v||'').replace(/\./g,'').replace(',','.'))||0;
+
+  const logo=`<div class="dk-rpt-brand"><div class="dk-lg" aria-hidden="true"></div><div class="dk-rpt-brand-text"><b>LEGUTI</b><span>Operations Intelligence</span></div></div>`;
+
+  const heading=`<div class="dk-rpt-header">${T('title','dk-rpt-h1')}${template==='insight'?'':T('subtitle','dk-rpt-desc')}</div>`;
+  const footer=`<div class="dk-rpt-foot">${n}</div>`;
+
+  let body='';
+
+  if(template==='cover'){
+    body=`
+      ${s.coverImage?`<div class="dk-rpt-cover-photo" style="background-image:url('${s.coverImage}')"></div>`:''}
+      ${logo}
+      <div class="dk-rpt-cover-left">
+        ${T('kicker','dk-rpt-kicker')}
+        ${T('title','dk-rpt-cover-title')}
+        ${T('subtitle','dk-rpt-cover-sub')}
+        ${T('meta','dk-rpt-meta')}
+      </div>
+      <div class="dk-rpt-cover-joni">${joni}</div>`;
+  }
+
+  else if(template==='summary'){
+    body=`
+      ${heading}
+      <div class="dk-rpt-summary-joni">${joni}</div>
+      <div class="dk-rpt-summary-cards">
+      ${s.k.map((k,i)=>{
+        const label=(k.l||'').split('|');
+        const delta=label[1]||'';
+        return `<div class="dk-rpt-kpi-card">
+          <div class="dk-rpt-kpi-label"${edit?` data-f="k" data-k="${i}" data-p="l" tabindex="0"`:''}>${h(label[0]||'Metrik')}</div>
+          <div class="dk-rpt-kpi-value"${edit?` data-f="k" data-k="${i}" data-p="v" tabindex="0"`:''}>${h(k.v||'—')}</div>
+          <div class="dk-rpt-kpi-delta">${h(delta)}</div>
+        </div>`;
+      }).join('')}
+      </div>`;
+  }
+
+  else if(template==='kpi'){
+    body=`
+      ${heading}
+      <div class="dk-rpt-side-joni left">${joni}</div>
+      <div class="dk-rpt-table-card"${edit?' data-f="body" tabindex="0"':''}>
+        <div class="dk-rpt-table-head">
+          <span>Indikator</span><span>Capaian</span>
+          <span>Target</span><span>Δ</span>
+        </div>
+        ${rows.map(r=>`
+          <div class="dk-rpt-table-row">
+            <span>${h(r[0]||'')}</span>
+            <span>${h(r[1]||'')}</span>
+            <span>${h(r[2]||'')}</span>
+            <span class="is-pos">${h(r[3]||'')}</span>
+          </div>`).join('')}
+      </div>`;
+  }
+
+  else if(template==='trend'){
+    const points=rows.slice(0,7).map(r=>({
+      label:r[0],
+      awb:parseNumber(r[1]),
+      ps8:parseNumber(r[2])
+    }));
+    const max=Math.max(1,...points.flatMap(x=>[x.awb,x.ps8]));
+
+    body=`
+      ${heading}
+      <div class="dk-rpt-chart-card"${edit?' data-f="body" tabindex="0"':''}>
+        <div class="dk-rpt-chart-gridline g1"></div>
+        <div class="dk-rpt-chart-gridline g2"></div>
+        <div class="dk-rpt-chart-gridline g3"></div>
+        <div class="dk-rpt-chart-bars">
+          ${points.map(p=>`
+            <div class="dk-rpt-chart-col">
+              <div class="dk-rpt-bar awb" style="height:${Math.max(3,p.awb/max*84)}%"></div>
+              <div class="dk-rpt-bar ps8" style="height:${Math.max(3,p.ps8/max*84)}%"></div>
+              <span>${h(p.label)}</span>
+            </div>`).join('')}
+        </div>
+        <div class="dk-rpt-chart-legend">
+          <i class="awb"></i><span>Total AWB</span>
+          <i class="ps8"></i><span>PS8 (Lolos Manifest)</span>
+        </div>
+      </div>
+      <div class="dk-rpt-side-joni right">${joni}</div>`;
+  }
+
+  else if(template==='line'){
+    const max=Math.max(1,...rows.map(r=>parseNumber(r[1])));
+
+    body=`
+      ${heading}
+      <div class="dk-rpt-side-joni left">${joni}</div>
+      <div class="dk-rpt-line-card"${edit?' data-f="body" tabindex="0"':''}>
+        <div class="dk-rpt-line-head">
+          <span>LINE</span><span></span>
+          <span>Total AWB</span><span>Kontribusi</span>
+        </div>
+        ${rows.map(r=>`
+          <div class="dk-rpt-line-row">
+            <div class="dk-rpt-line-name">${h(r[0]||'')}</div>
+            <div class="dk-rpt-line-bar-wrap">
+              <i class="dk-rpt-line-bar" style="width:${Math.max(3,parseNumber(r[1])/max*100)}%"></i>
+            </div>
+            <div class="dk-rpt-line-val">${h(r[1]||'')}</div>
+            <div class="dk-rpt-line-pct">${h(r[2]||'')}</div>
+          </div>`).join('')}
+      </div>`;
+  }
+
+  else if(template==='insight'){
+    body=`
+      ${heading}
+      <div class="dk-rpt-insight-joni">${joni}</div>
+      <div class="dk-rpt-insight-grid">
+        <div class="dk-rpt-insight-box">
+          <b>Insight Utama</b>
+          ${T('insight','dk-rpt-insight-text')}
+        </div>
+        <div class="dk-rpt-rekom-box"${edit?' data-f="body" tabindex="0"':''}>
+          <b>Rekomendasi</b>
+          <ul class="dk-rpt-bullets">
+            ${lines(s.body).map(x=>`<li>${h(x)}</li>`).join('')}
+          </ul>
+        </div>
+      </div>`;
+  }
+
+  return `<div class="dk-s dk-rpt dk-rpt-${template}${edit?' dk-e':''}"><div class="dk-rpt-bg"></div>${body}${footer}${objectHTML(s,edit)}</div>`;
+}
 /* ---------- kerangka DOM ---------- */
 const root=document.createElement('div');
 root.id='view-deck';root.hidden=true;main.appendChild(root);
