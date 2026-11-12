@@ -382,35 +382,59 @@ function slideHTML(s,n,edit){
       </div>`;
   }
 
-  else if(template==='trend'){
-    const points=rows.slice(0,7).map(r=>({
-      label:r[0],
-      awb:parseNumber(r[1]),
-      ps8:parseNumber(r[2])
-    }));
-    const max=Math.max(1,...points.flatMap(x=>[x.awb,x.ps8]));
+  
+else if(template==='trend'){
+  const points=lines(s.body).slice(0,7).map(line=>{
+    const r=line.includes('|')
+      ?line.split('|').map(x=>x.trim())
+      :line.split(/:\s*/).map(x=>x.trim());
 
-    body=`
-      ${heading}
-      <div class="dk-rpt-chart-card"${edit?' data-f="body" tabindex="0"':''}>
-        <div class="dk-rpt-chart-gridline g1"></div>
-        <div class="dk-rpt-chart-gridline g2"></div>
-        <div class="dk-rpt-chart-gridline g3"></div>
-        <div class="dk-rpt-chart-bars">
-          ${points.map(p=>`
-            <div class="dk-rpt-chart-col">
-              <div class="dk-rpt-bar awb" style="height:${Math.max(3,p.awb/max*84)}%"></div>
-              <div class="dk-rpt-bar ps8" style="height:${Math.max(3,p.ps8/max*84)}%"></div>
-              <span>${h(p.label)}</span>
-            </div>`).join('')}
-        </div>
-        <div class="dk-rpt-chart-legend">
-          <i class="awb"></i><span>Total AWB</span>
-          <i class="ps8"></i><span>PS8 (Lolos Manifest)</span>
-        </div>
+    const date=r[0]||'';
+    const label=/^\d{4}-\d{2}-\d{2}$/.test(date)
+      ?date.slice(8,10)+'/'+date.slice(5,7)
+      :date;
+
+    return {
+      label,
+      awb:Math.max(0,parseNumber(r[1])),
+      ps8:r.length>2?Math.max(0,parseNumber(r[2])):null
+    };
+  });
+
+  const max=Math.max(1,...points.flatMap(p=>[
+    p.awb,
+    p.ps8===null?0:p.ps8
+  ]));
+
+  const hasPS8=points.some(p=>p.ps8!==null);
+  const fmt=v=>Number(v).toLocaleString('id-ID');
+
+  body=`
+    ${heading}
+    <div class="dk-daily-chart"${edit?' data-f="body" tabindex="0"':''}>
+      <div class="dk-daily-bars">
+        ${points.map(p=>`
+          <div class="dk-daily-group">
+            <div class="dk-daily-track">
+              <div class="dk-daily-bar awb"
+                   style="height:${Math.max(2,p.awb/max*88)}%">
+                <span>${fmt(p.awb)}</span>
+              </div>
+              ${hasPS8?`
+                <div class="dk-daily-bar ps8"
+                     style="height:${Math.max(2,(p.ps8||0)/max*88)}%">
+                </div>`:''}
+            </div>
+            <div class="dk-daily-date">${h(p.label)}</div>
+          </div>`).join('')}
       </div>
-      <div class="dk-rpt-side-joni right">${joni}</div>`;
-  }
+      <div class="dk-daily-legend">
+        <span><i class="awb"></i> Total AWB</span>
+        ${hasPS8?'<span><i class="ps8"></i> PS8 (Lolos Manifest)</span>':''}
+      </div>
+    </div>
+    <div class="dk-rpt-side-joni right">${joni}</div>`;
+}
 
   else if(template==='line'){
     const max=Math.max(1,...rows.map(r=>parseNumber(r[1])));
