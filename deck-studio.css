@@ -614,3 +614,79 @@
     min-height: 76px;
   }
 }
+
+/* JONI AI — TEMPLATE PRESENTASI BAWAAN */
+
+#view-deck .dk-has-joni .dk-template-joni {
+  position: absolute;
+  right: 1%;
+  bottom: 1%;
+  width: 34%;
+  height: 84%;
+  object-fit: contain;
+  object-position: right bottom;
+  pointer-events: none;
+  z-index: 2;
+  filter: drop-shadow(0 0 2.5cqw #02d9ff40);
+}
+
+/* Cover */
+#view-deck .dk-has-joni.dk-L-title .dk-main {
+  width: 58cqw;
+}
+
+#view-deck .dk-has-joni.dk-L-title .dk-template-joni {
+  width: 43%;
+  height: 93%;
+}
+
+/* Executive Summary dan Action Plan */
+#view-deck .dk-has-joni.dk-L-content .dk-ul {
+  right: 36cqw;
+}
+
+/* KPI — susun menjadi 2 x 2 */
+#view-deck .dk-has-joni.dk-L-kpi .dk-kpis {
+  right: 37cqw;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5cqw;
+}
+
+#view-deck .dk-has-joni.dk-L-kpi .dk-kpi {
+  min-height: 13cqw;
+}
+
+#view-deck .dk-has-joni.dk-L-kpi .dk-sub {
+  right: 38cqw;
+  top: 52cqw;
+}
+
+/* Grafik */
+#view-deck .dk-has-joni.dk-L-chart .dk-chart {
+  right: 36cqw;
+}
+
+#view-deck .dk-has-joni.dk-L-chart .dk-chart-row {
+  grid-template-columns: 13cqw minmax(0,1fr) 7cqw;
+}
+
+/* Insight dan rekomendasi */
+#view-deck .dk-has-joni.dk-L-insight .dk-ins {
+  right: 36cqw;
+  font-size: 2.4cqw;
+}
+
+#view-deck .dk-has-joni.dk-L-insight .dk-ul {
+  right: 36cqw;
+}
+
+/* Jaga tulisan tetap berada di atas dekorasi */
+#view-deck .dk-has-joni .dk-main,
+#view-deck .dk-has-joni .dk-hd,
+#view-deck .dk-has-joni .dk-kpis,
+#view-deck .dk-has-joni .dk-chart,
+#view-deck .dk-has-joni .dk-ul,
+#view-deck .dk-has-joni .dk-ins {
+  z-index: 3;
+}
+
