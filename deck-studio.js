@@ -137,7 +137,6 @@ if(typeof o.autoSource==='string')s.autoSource=clip(o.autoSource,50);
   return s;
 }
 function sampleDeck(){
-function sampleDeck(){
   const a=emptySlide('title');
   Object.assign(a,{
     autoSource:'cover',
