@@ -1851,3 +1851,413 @@
     transition:none!important;
   }
 }
+
+
+/* =============================================
+   LEGUTI CINEMATIC MOTION ENGINE V2
+   Six Exclusive Presentation Experiences
+   Preview & Fullscreen Only
+   ============================================= */
+
+/* Dasar animasi */
+#view-deck .dk-present-motion .dk-rpt{
+  transform-origin:center;
+  animation:dkCineOpen .75s cubic-bezier(.2,.8,.2,1) both!important;
+}
+
+#view-deck .dk-present-motion .dk-rpt :is(
+  .dk-rpt-header,
+  .dk-rpt-cover-left,
+  .dk-rpt-brand
+){
+  animation:dkCineText .8s cubic-bezier(.2,.8,.2,1) .2s both;
+}
+
+#view-deck .dk-present-motion .dk-rpt :is(
+  .dk-rpt-cover-joni,
+  .dk-rpt-summary-joni,
+  .dk-rpt-side-joni,
+  .dk-rpt-insight-joni
+){
+  animation:dkCineJoni 1s cubic-bezier(.16,1,.3,1) .15s both;
+}
+
+/* Efek muncul berurutan */
+#view-deck .dk-present-motion .dk-rpt-kpi-card,
+#view-deck .dk-present-motion .dk-rpt-table-row,
+#view-deck .dk-present-motion .dk-rpt-line-row{
+  animation:dkCineCard .65s cubic-bezier(.16,1,.3,1) both;
+}
+
+#view-deck .dk-present-motion .dk-rpt-kpi-card:nth-child(1),
+#view-deck .dk-present-motion .dk-rpt-table-row:nth-child(2),
+#view-deck .dk-present-motion .dk-rpt-line-row:nth-child(2){
+  animation-delay:.35s;
+}
+
+#view-deck .dk-present-motion .dk-rpt-kpi-card:nth-child(2),
+#view-deck .dk-present-motion .dk-rpt-table-row:nth-child(3),
+#view-deck .dk-present-motion .dk-rpt-line-row:nth-child(3){
+  animation-delay:.47s;
+}
+
+#view-deck .dk-present-motion .dk-rpt-kpi-card:nth-child(3),
+#view-deck .dk-present-motion .dk-rpt-table-row:nth-child(4),
+#view-deck .dk-present-motion .dk-rpt-line-row:nth-child(4){
+  animation-delay:.59s;
+}
+
+#view-deck .dk-present-motion .dk-rpt-kpi-card:nth-child(4),
+#view-deck .dk-present-motion .dk-rpt-table-row:nth-child(5),
+#view-deck .dk-present-motion .dk-rpt-line-row:nth-child(5){
+  animation-delay:.71s;
+}
+
+/* Animasi grafik */
+#view-deck .dk-present-motion :is(
+  .dk-daily-bar,
+  .dk-rpt-bar
+){
+  transform-origin:bottom center;
+  animation:dkCineBar 1.05s cubic-bezier(.16,1,.3,1) .4s both;
+}
+
+#view-deck .dk-present-motion .dk-rpt-line-bar{
+  transform-origin:left center;
+  animation:dkCineLine .85s cubic-bezier(.16,1,.3,1) .4s both;
+}
+
+#view-deck .dk-present-motion :is(
+  .dk-rpt-insight-box,
+  .dk-rpt-rekom-box
+){
+  animation:dkCineCard .75s ease-out .45s both;
+}
+
+/* Keyframes utama */
+@keyframes dkCineOpen{
+  from{opacity:0;transform:scale(.96)}
+  to{opacity:1;transform:scale(1)}
+}
+
+@keyframes dkCineText{
+  from{opacity:0;transform:translateY(2cqw);filter:blur(5px)}
+  to{opacity:1;transform:translateY(0);filter:blur(0)}
+}
+
+@keyframes dkCineJoni{
+  from{opacity:0;transform:translateX(7cqw) scale(.83)}
+  to{opacity:1;transform:translateX(0) scale(1)}
+}
+
+@keyframes dkCineCard{
+  from{opacity:0;transform:translateY(3cqw) scale(.94)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+
+@keyframes dkCineBar{
+  from{transform:scaleY(0);opacity:.2}
+  to{transform:scaleY(1);opacity:1}
+}
+
+@keyframes dkCineLine{
+  from{transform:scaleX(0);opacity:.2}
+  to{transform:scaleX(1);opacity:1}
+}
+
+/* =============================================
+   MIDNIGHT — EXECUTIVE CINEMATIC
+   ============================================= */
+
+#view-deck[data-deck-theme="midnight"]
+.dk-present-motion .dk-rpt{
+  animation:dkMidnightOpen 1s ease-out both!important;
+}
+
+#view-deck[data-deck-theme="midnight"]
+.dk-present-motion .dk-rpt-bg::after{
+  background:radial-gradient(
+    ellipse at 55% 45%,
+    rgba(31,198,255,.24),
+    transparent 57%
+  );
+  animation:dkMidnightSpot 5s ease-in-out infinite alternate!important;
+}
+
+@keyframes dkMidnightOpen{
+  from{opacity:0;transform:scale(.975);filter:brightness(.5)}
+  to{opacity:1;transform:scale(1);filter:brightness(1)}
+}
+
+@keyframes dkMidnightSpot{
+  from{transform:translateX(-15%);opacity:.2}
+  to{transform:translateX(17%);opacity:.7}
+}
+
+/* =============================================
+   ARCTIC — CRYSTAL REVEAL
+   ============================================= */
+
+#view-deck[data-deck-theme="arctic"]
+.dk-present-motion .dk-rpt{
+  animation:dkArcticOpen .9s ease-out both!important;
+}
+
+#view-deck[data-deck-theme="arctic"]
+.dk-present-motion .dk-rpt-bg::after{
+  background:linear-gradient(
+    105deg,
+    transparent 35%,
+    rgba(255,255,255,.6) 50%,
+    transparent 65%
+  );
+  animation:dkArcticSweep 3.5s ease-in-out infinite!important;
+}
+
+@keyframes dkArcticOpen{
+  from{opacity:0;filter:blur(9px);transform:scale(1.035)}
+  to{opacity:1;filter:blur(0);transform:scale(1)}
+}
+
+@keyframes dkArcticSweep{
+  from{transform:translateX(-95%);opacity:0}
+  35%{opacity:.65}
+  to{transform:translateX(95%);opacity:0}
+}
+
+/* =============================================
+   AURORA — LIQUID LIGHT
+   ============================================= */
+
+#view-deck[data-deck-theme="aurora"]
+.dk-present-motion .dk-rpt-bg::before{
+  background:
+    radial-gradient(ellipse at 25% 30%,#ab3cff55,transparent 58%),
+    radial-gradient(ellipse at 76% 65%,#13d4ff40,transparent 62%);
+  filter:blur(3cqw);
+  animation:dkAuroraLiquid 9s ease-in-out infinite alternate!important;
+}
+
+#view-deck[data-deck-theme="aurora"]
+.dk-present-motion .dk-rpt :is(
+  .dk-rpt-cover-joni,
+  .dk-rpt-summary-joni,
+  .dk-rpt-side-joni,
+  .dk-rpt-insight-joni
+){
+  animation:
+    dkCineJoni 1.2s ease-out both,
+    dkAuroraFloat 5s ease-in-out 1.2s infinite;
+}
+
+@keyframes dkAuroraLiquid{
+  from{transform:translate(-12%,-7%) rotate(-8deg);opacity:.4}
+  to{transform:translate(15%,10%) rotate(8deg);opacity:.85}
+}
+
+@keyframes dkAuroraFloat{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-.8cqw)}
+}
+
+/* =============================================
+   CYBERPUNK — NEON OVERDRIVE
+   ============================================= */
+
+#view-deck[data-deck-theme="cyberpunk"]
+.dk-present-motion .dk-rpt{
+  animation:dkCyberGlitch .65s steps(1,end) both!important;
+}
+
+#view-deck[data-deck-theme="cyberpunk"]
+.dk-present-motion .dk-rpt-bg::before{
+  background:repeating-linear-gradient(
+    115deg,
+    transparent 0 12cqw,
+    rgba(255,25,200,.32) 12cqw 12.25cqw,
+    transparent 12.25cqw 19cqw,
+    rgba(0,236,255,.28) 19cqw 19.25cqw
+  );
+  animation:dkCyberLaser 2.8s linear infinite!important;
+}
+
+#view-deck[data-deck-theme="cyberpunk"]
+.dk-present-motion .dk-rpt-bg::after{
+  background:linear-gradient(
+    90deg,
+    transparent 40%,
+    rgba(255,43,212,.25) 49%,
+    rgba(13,237,255,.4) 50%,
+    transparent 60%
+  );
+  animation:dkCyberFlash 4s linear infinite!important;
+}
+
+#view-deck[data-deck-theme="cyberpunk"]
+.dk-present-motion .dk-rpt-kpi-card{
+  box-shadow:0 0 2cqw rgba(255,34,203,.4);
+}
+
+@keyframes dkCyberGlitch{
+  0%{opacity:0;transform:translateX(-4cqw) skewX(-3deg)}
+  20%{opacity:.85;transform:translateX(.8cqw) skewX(1deg)}
+  28%{transform:translateX(-.5cqw)}
+  40%{transform:translateX(.3cqw)}
+  55%,100%{opacity:1;transform:none}
+}
+
+@keyframes dkCyberLaser{
+  from{transform:translateX(-20%)}
+  to{transform:translateX(20%)}
+}
+
+@keyframes dkCyberFlash{
+  0%,10%{transform:translateX(-100%);opacity:0}
+  25%{opacity:.95}
+  45%,100%{transform:translateX(100%);opacity:0}
+}
+
+/* =============================================
+   QUANTUM — HOLOGRAPHIC INTELLIGENCE
+   ============================================= */
+
+#view-deck[data-deck-theme="quantum"]
+.dk-present-motion .dk-rpt{
+  animation:dkQuantumOpen .9s cubic-bezier(.2,.8,.2,1) both!important;
+}
+
+#view-deck[data-deck-theme="quantum"]
+.dk-present-motion .dk-rpt-bg::before{
+  inset:0;
+  background:
+    linear-gradient(#17e9a91f 1px,transparent 1px),
+    linear-gradient(90deg,#17e9a91f 1px,transparent 1px);
+  background-size:5cqw 5cqw;
+  animation:dkQuantumMatrix 6s linear infinite!important;
+}
+
+#view-deck[data-deck-theme="quantum"]
+.dk-present-motion .dk-rpt-bg::after{
+  background:linear-gradient(
+    to bottom,
+    transparent 42%,
+    rgba(27,255,183,.24) 49%,
+    rgba(50,255,215,.4) 50%,
+    transparent 58%
+  );
+  animation:dkQuantumScanner 4.5s linear infinite!important;
+}
+
+@keyframes dkQuantumOpen{
+  from{opacity:0;transform:perspective(90cqw) rotateX(7deg) scale(.96)}
+  to{opacity:1;transform:perspective(90cqw) rotateX(0) scale(1)}
+}
+
+@keyframes dkQuantumMatrix{
+  from{background-position:0 0}
+  to{background-position:5cqw 5cqw}
+}
+
+@keyframes dkQuantumScanner{
+  from{transform:translateY(-90%)}
+  to{transform:translateY(90%)}
+}
+
+/* =============================================
+   VELOCITY — HYPER SPEED
+   ============================================= */
+
+#view-deck[data-deck-theme="velocity"]
+.dk-present-motion .dk-rpt{
+  animation:dkVelocityWipe .6s cubic-bezier(.16,1,.3,1) both!important;
+}
+
+#view-deck[data-deck-theme="velocity"]
+.dk-present-motion .dk-rpt-bg::before{
+  background:repeating-linear-gradient(
+    115deg,
+    transparent 0 16cqw,
+    rgba(255,144,51,.35) 16cqw 16.8cqw,
+    transparent 16.8cqw 25cqw,
+    rgba(30,160,255,.3) 25cqw 25.7cqw
+  );
+  animation:dkVelocityRush 2s linear infinite!important;
+}
+
+#view-deck[data-deck-theme="velocity"]
+.dk-present-motion .dk-rpt :is(
+  .dk-rpt-cover-joni,
+  .dk-rpt-summary-joni,
+  .dk-rpt-side-joni,
+  .dk-rpt-insight-joni
+){
+  animation:dkVelocityJoni .7s cubic-bezier(.16,1,.3,1) .1s both;
+}
+
+@keyframes dkVelocityWipe{
+  from{
+    opacity:.2;
+    transform:translateX(8cqw) scale(1.045);
+    clip-path:inset(0 0 0 100%);
+  }
+  to{
+    opacity:1;
+    transform:translateX(0) scale(1);
+    clip-path:inset(0 0 0 0);
+  }
+}
+
+@keyframes dkVelocityRush{
+  from{transform:translateX(-28%)}
+  to{transform:translateX(28%)}
+}
+
+@keyframes dkVelocityJoni{
+  from{opacity:0;transform:translateX(12cqw) scale(1.18)}
+  to{opacity:1;transform:translateX(0) scale(1)}
+}
+
+/* =============================================
+   PERFORMANCE, EDITOR SAFETY & ACCESSIBILITY
+   ============================================= */
+
+/* Animasi sinematik hanya diputar di Preview/fullscreen */
+#view-deck .dk-rpt-bg::before,
+#view-deck .dk-rpt-bg::after{
+  animation:none!important;
+}
+
+#view-deck .dk-present-motion .dk-rpt-bg{
+  pointer-events:none;
+}
+
+/* Jangan animasikan thumbnail */
+#view-deck .dk-fr .dk-rpt,
+#view-deck .dk-fr .dk-rpt *,
+#view-deck .dk-fr .dk-rpt-bg::before,
+#view-deck .dk-fr .dk-rpt-bg::after{
+  animation:none!important;
+}
+
+/* Kartu hanya interaktif dengan hover di editor */
+#view-deck .dk-frame:not(.dk-present-motion)
+.dk-rpt-kpi-card:hover{
+  transform:translateY(-.5cqw);
+  box-shadow:0 0 2cqw
+    color-mix(in srgb,var(--dk-accent) 35%,transparent);
+}
+
+/* Hormati preferensi pengurangan gerakan */
+@media(prefers-reduced-motion:reduce){
+  #view-deck .dk-present-motion .dk-rpt,
+  #view-deck .dk-present-motion .dk-rpt *,
+  #view-deck .dk-present-motion .dk-rpt::before,
+  #view-deck .dk-present-motion .dk-rpt::after,
+  #view-deck .dk-present-motion .dk-rpt-bg::before,
+  #view-deck .dk-present-motion .dk-rpt-bg::after{
+    animation:none!important;
+    transition:none!important;
+    transform:none!important;
+    filter:none!important;
+  }
+}
