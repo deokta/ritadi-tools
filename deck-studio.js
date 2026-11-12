@@ -225,6 +225,11 @@ const root=document.createElement('div');
 root.id='view-deck';root.hidden=true;main.appendChild(root);
 const q=s=>root.querySelector(s);
 
+<button type="button"
+  class="dk-action"
+  data-act="joniTemplate">
+  <span>✦ Template Joni</span>
+</button>
 function build(){
   if(built)return;built=true;
   const img=document.querySelector('img.logo');
@@ -353,6 +358,18 @@ function focusField(f,k,p){
   if(el){el.focus();try{el.scrollIntoView({block:'nearest'})}catch(_){}}
 }
 const ACT={
+joniTemplate(){
+  if(!confirm(
+    'Gunakan 6 template Joni AI? Presentasi yang sedang dibuka akan diganti. Simpan cadangan terlebih dahulu.'
+  )) return;
+
+  st.deck = sampleDeck();
+  st.sel = 0;
+  st.tab = 'design';
+  drawAll();
+  dirty();
+  say('Template Joni AI berhasil diterapkan');
+},
   add(){
     const sl=st.deck.slides;
     if(sl.length>=MAX_SLIDES){say('Maksimal '+MAX_SLIDES+' slide');return}
@@ -577,9 +594,40 @@ async function exportPPTX(){const btn=q('[data-act="export"]');btn.disabled=true
  try{const P=await loadPptx(),pptx=new P();pptx.layout='LAYOUT_WIDE';pptx.author='LEGUTI Operations Intelligence';pptx.subject='Outbound Performance';pptx.title=st.deck.name;pptx.lang='id-ID';
  const accent=(st.deck.accent||'#12e8d8').replace('#','');const dark=st.deck.theme!=='arctic',bg=dark?(st.deck.theme==='aurora'?'150E35':'07132D'):'EFF6FF',fg=dark?'FFFFFF':'12264A';
  const tx=(slide,text,x,y,w,h,size=22,opt={})=>{if(!String(text||'').trim())return;slide.addText(String(text),{x,y,w,h,fontFace:'Aptos',fontSize:size,color:fg,margin:0,breakLine:false,fit:'shrink',...opt})};
+ const joniPng = {};
+
+await Promise.all(
+  [...new Set(st.deck.slides.map(s => s.joni))]
+    .filter(k => JONI_ART[k])
+    .map(async k => {
+      const response = await fetch(JONI_ART[k]);
+      if (!response.ok) {
+        throw new Error('Gambar Joni gagal dimuat: ' + k);
+      }
+
+      const blob = await response.blob();
+      joniPng[k] = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    })
+);
  st.deck.slides.forEach((s,i)=>{const sl=pptx.addSlide();sl.background={color:bg};sl.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.333,h:.08,line:{color:accent},fill:{color:accent}});
+ if (s.joni && joniPng[s.joni]) {
+  const isCover = s.layout === 'title';
+
+  sl.addImage({
+    data: joniPng[s.joni],
+    x: isCover ? 7.7 : 9.1,
+    y: isCover ? 0.6 : 1.4,
+    w: isCover ? 5.2 : 3.8,
+    h: isCover ? 6.4 : 5.4
+  });
+}
  if(s.layout==='title'||s.layout==='section'){
-  if(s.layout==='title'&&s.coverImage){sl.addImage({data:s.coverImage,x:7.25,y:.10,w:6.08,h:7.0});}
+ if(s.layout==='title'&&s.coverImage){sl.addImage({data:s.coverImage,x:7.25,y:.10,w:6.08,h:7.0});}
  sl.addShape(pptx.ShapeType.chevron,{x:10.8,y:0,w:2.55,h:7.5,line:{color:accent,transparency:100},fill:{color:accent,transparency:77}});
  tx(sl,'JNE  |  LEGUTI',.8,.45,5,.45,20,{bold:true});tx(sl,s.kicker,.8,2.0,10,.35,15,{bold:true,color:accent,charSpacing:2});tx(sl,s.title,.8,2.5,s.coverImage&&s.layout==='title'?6.3:10.8,1.45,42,{bold:true});tx(sl,s.subtitle,.8,4.45,s.coverImage&&s.layout==='title'?6.2:10,.75,23,{italic:true});tx(sl,s.meta,.8,5.5,8,.5,18);
  }else{
