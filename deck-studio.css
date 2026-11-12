@@ -1401,3 +1401,27 @@
 #view-deck .dk-daily-legend i.ps8{
   background:#27e5cf;
 }
+
+
+/* KPI PREMIUM — TARGET MANUAL & SELISIH OTOMATIS */
+
+#view-deck .dk-rpt-kpi .dk-rpt-table-head,
+#view-deck .dk-rpt-kpi .dk-rpt-table-row{
+  grid-template-columns:2.1fr 1fr 1fr 1fr;
+  gap:.7cqw;
+}
+
+#view-deck .dk-rpt-kpi .dk-rpt-table-row span:nth-child(2),
+#view-deck .dk-rpt-kpi .dk-rpt-table-row span:nth-child(3){
+  font-weight:800;
+}
+
+#view-deck .dk-rpt-kpi .dk-rpt-table-row .is-pos{
+  color:#2ef0b5;
+  font-weight:800;
+}
+
+#view-deck .dk-rpt-kpi .dk-rpt-table-row .is-neg{
+  color:#ff647c;
+  font-weight:800;
+}
