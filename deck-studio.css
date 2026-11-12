@@ -889,3 +889,238 @@
   content:"•"; position:absolute; left:0; top:0; color:#28efd8; font-weight:900;
 }
 
+
+/* JONI PREMIUM — penyempurnaan enam template saja */
+
+#view-deck .dk-rpt{
+  background:radial-gradient(52cqw 46cqw at 91% -4%,#0b3481 0,transparent 74%),radial-gradient(45cqw 30cqw at 3% 108%,#3722a1 0,transparent 75%),linear-gradient(120deg,#020a24,#071d51 55%,#031333);
+  isolation:isolate;
+}
+
+#view-deck .dk-rpt-bg{
+  pointer-events:none;
+  background:linear-gradient(120deg,transparent 0 56%,rgba(0,214,253,.12) 56% 58%,transparent 59%),linear-gradient(116deg,transparent 0 72%,rgba(56,116,250,.2) 72% 79%,transparent 80%);
+}
+
+#view-deck .dk-rpt-brand,
+#view-deck .dk-rpt-header,
+#view-deck .dk-rpt-cover-left,
+#view-deck .dk-rpt-summary-cards,
+#view-deck .dk-rpt-table-card,
+#view-deck .dk-rpt-line-card,
+#view-deck .dk-rpt-chart-card,
+#view-deck .dk-rpt-insight-grid{
+  z-index:3;
+}
+
+#view-deck .dk-rpt-cover-joni,
+#view-deck .dk-rpt-summary-joni,
+#view-deck .dk-rpt-side-joni,
+#view-deck .dk-rpt-insight-joni{
+  z-index:2;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  pointer-events:none;
+}
+
+#view-deck .dk-rpt .dk-template-joni{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  object-position:center bottom;
+  max-width:none;
+  max-height:none;
+  filter:drop-shadow(0 0 1.3cqw rgba(12,229,253,.23));
+}
+
+/* Slide 1 — Cover */
+#view-deck .dk-rpt-cover-joni{
+  width:50%;
+  height:94%;
+  right:-1%;
+  bottom:0;
+}
+
+#view-deck .dk-rpt-cover-left{
+  top:11cqw;
+  width:45%;
+  z-index:4;
+}
+
+#view-deck .dk-rpt-cover-title{
+  font-size:5.7cqw;
+  line-height:1.04;
+  max-width:100%;
+}
+
+/* Slide 2 — Executive Summary */
+#view-deck .dk-rpt-summary-joni{
+  left:1%;
+  bottom:0;
+  width:35%;
+  height:91%;
+}
+
+#view-deck .dk-rpt-summary-cards{
+  left:34%;
+  right:2%;
+  top:15cqw;
+  width:auto;
+  gap:1cqw;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+}
+
+#view-deck .dk-rpt-summary-cards .dk-rpt-kpi-card{
+  min-width:0;
+  min-height:14.5cqw;
+  padding:1.1cqw .6cqw;
+  background:linear-gradient(160deg,rgba(19,68,144,.89),rgba(4,18,56,.98));
+  border:.15cqw solid rgba(32,222,255,.68);
+}
+
+#view-deck .dk-rpt-kpi-value{
+  font-size:2.1cqw;
+  white-space:nowrap;
+}
+
+#view-deck .dk-rpt-kpi-label{
+  font-size:1.15cqw;
+  overflow-wrap:anywhere;
+}
+
+/* Semua slide — judul dan subjudul */
+#view-deck .dk-rpt .dk-rpt-h1{
+  font-size:3.6cqw;
+  line-height:1.06;
+  padding-bottom:1cqw;
+  border-bottom:.13cqw solid rgba(41,207,229,.46);
+}
+
+#view-deck .dk-rpt .dk-rpt-desc{
+  font-size:1.5cqw;
+  max-width:70%;
+  margin-top:1.3cqw;
+}
+
+/* Slide 3 dan 5 — Joni kiri + tabel */
+#view-deck .dk-rpt-side-joni.left{
+  width:30%;
+  height:88%;
+  left:-3%;
+  bottom:0;
+}
+
+#view-deck .dk-rpt-table-card,
+#view-deck .dk-rpt-line-card{
+  left:30%;
+  right:2%;
+  top:14cqw;
+  bottom:5cqw;
+  overflow:hidden;
+}
+
+#view-deck .dk-rpt-table-head,
+#view-deck .dk-rpt-table-row{
+  font-size:1.3cqw;
+  grid-template-columns:2.25fr 1.15fr 1.15fr .8fr;
+}
+
+#view-deck .dk-rpt-table-row{
+  padding:1.15cqw .7cqw;
+}
+
+#view-deck .dk-rpt-table-row span:nth-child(2){
+  font-weight:800;
+}
+
+/* Slide 4 — Joni kanan + grafik */
+#view-deck .dk-rpt-side-joni.right{
+  width:31%;
+  height:87%;
+  right:-1%;
+  bottom:0;
+}
+
+#view-deck .dk-rpt-chart-card{
+  left:3%;
+  right:28%;
+  top:14cqw;
+  bottom:5cqw;
+  overflow:hidden;
+}
+
+#view-deck .dk-rpt-chart-bars{
+  top:1.2cqw;
+  bottom:3.8cqw;
+  left:2cqw;
+  right:2cqw;
+  align-items:end;
+}
+
+#view-deck .dk-rpt-chart-col{
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  gap:.7cqw;
+  min-width:0;
+}
+
+#view-deck .dk-rpt-chart-col .dk-rpt-bar{
+  width:35%;
+  flex:none;
+}
+
+#view-deck .dk-rpt-chart-col>span{
+  position:absolute;
+  bottom:-2.2cqw;
+  left:0;
+  right:0;
+  text-align:center;
+  font-size:1cqw;
+  white-space:nowrap;
+}
+
+#view-deck .dk-rpt-line-head,
+#view-deck .dk-rpt-line-row{
+  grid-template-columns:1.3fr 1.45fr 1fr .8fr;
+}
+
+/* Slide 6 — Insight & Rekomendasi */
+#view-deck .dk-rpt-insight-joni{
+  width:32%;
+  height:90%;
+  left:-1%;
+  bottom:0;
+}
+
+#view-deck .dk-rpt-insight-grid{
+  left:34%;
+  right:2%;
+  top:13cqw;
+  bottom:4cqw;
+  gap:1.3cqw;
+  padding:1cqw;
+  border:0;
+  box-shadow:none;
+  background:transparent;
+}
+
+#view-deck .dk-rpt-insight-box,
+#view-deck .dk-rpt-rekom-box{
+  border-color:#2879e9;
+  border-radius:1.3cqw;
+  padding:1.5cqw 1.7cqw;
+  background:linear-gradient(135deg,rgba(6,38,93,.9),rgba(22,15,76,.8));
+}
+
+#view-deck .dk-rpt-rekom-box{
+  border-color:#9354ff;
+}
+
+#view-deck .dk-rpt-insight-text,
+#view-deck .dk-rpt-bullets li{
+  font-size:1.35cqw;
+  line-height:1.35;
+}
