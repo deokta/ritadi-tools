@@ -225,11 +225,6 @@ const root=document.createElement('div');
 root.id='view-deck';root.hidden=true;main.appendChild(root);
 const q=s=>root.querySelector(s);
 
-<button type="button"
-  class="dk-action"
-  data-act="joniTemplate">
-  <span>✦ Template Joni</span>
-</button>
 function build(){
   if(built)return;built=true;
   const img=document.querySelector('img.logo');
@@ -238,7 +233,8 @@ function build(){
   <div class="dk-bar dk-pn">
     <div class="dk-ic">${icon('deck')}</div>
     <label class="dk-nm"><span>LEGUTI Deck Studio <b class="dk-ai-tag">AI</b></span><input data-name maxlength="${MAX_NAME}" autocomplete="off" aria-label="Nama presentasi"></label>
-    <div class="dk-sv" id="dkSv"><i></i><span>Tersimpan otomatis</span></div>
+    <div class="dk-sv" id="dkSv"><i></i><span>Tersimpan otomatis</span></div> 
+    <button type="button" class="dk-action" data-act="joniTemplate"><span>✦ Template Joni</span></button>
     <button type="button" class="dk-action" data-act="save">${icon('dkSave')}<span>Simpan Draft</span></button>
     <button type="button" class="dk-action" data-act="preview">${icon('dkPlay')}<span>Preview</span></button>
     <button type="button" class="dk-action primary" data-act="export">${icon('dkDownload')}<span>Ekspor PPTX</span></button>
