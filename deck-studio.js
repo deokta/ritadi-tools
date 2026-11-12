@@ -73,6 +73,48 @@ const icon=k=>typeof ico==='function'?ico(k):'';
 
 
 /* ---------- util ---------- */
+
+/* PERHITUNGAN SELISIH KPI */
+function calculateKpiDifference(capaian,target){
+  const c=String(capaian||'').trim();
+  const t=String(target||'').trim();
+
+  if(!c||!t||c==='—'||t==='—')return '—';
+
+  const parse=v=>{
+    let x=v.replace(/[%\s]/g,'');
+    if(x.includes(',')){
+      x=x.replace(/\./g,'').replace(',','.');
+    }else if(/^\d{1,3}(\.\d{3})+$/.test(x)){
+      x=x.replace(/\./g,'');
+    }
+    return Number(x);
+  };
+
+  const actual=parse(c);
+  const goal=parse(t);
+
+  if(!Number.isFinite(actual)||!Number.isFinite(goal))return '—';
+
+  if(c.includes('%')&&t.includes('%')){
+    const diff=actual-goal;
+    return (diff>0?'+':'')+
+      diff.toLocaleString('id-ID',{
+        minimumFractionDigits:1,
+        maximumFractionDigits:1
+      })+' p.p.';
+  }
+
+  if(goal===0)return '—';
+
+  const diff=(actual-goal)/goal*100;
+
+  return (diff>0?'+':'')+
+    diff.toLocaleString('id-ID',{
+      minimumFractionDigits:2,
+      maximumFractionDigits:2
+    })+'%';
+}
 const h=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const lines=t=>String(t||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
 const rid=()=>Math.random().toString(36).slice(2,9);
@@ -363,25 +405,39 @@ function slideHTML(s,n,edit){
       </div>`;
   }
 
-  else if(template==='kpi'){
-    body=`
-      ${heading}
-      <div class="dk-rpt-side-joni left">${joni}</div>
-      <div class="dk-rpt-table-card"${edit?' data-f="body" tabindex="0"':''}>
-        <div class="dk-rpt-table-head">
-          <span>Indikator</span><span>Capaian</span>
-          <span>Target</span><span>Δ</span>
-        </div>
-        ${rows.map(r=>`
+  
+else if(template==='kpi'){
+  body=`
+    ${heading}
+    <div class="dk-rpt-side-joni left">${joni}</div>
+
+    <div class="dk-rpt-table-card">
+      <div class="dk-rpt-table-head">
+        <span>Indikator</span>
+        <span>Capaian</span>
+        <span>Target</span>
+        <span>Selisih</span>
+      </div>
+
+      ${rows.map(r=>{
+        const selisih=calculateKpiDifference(r[1],r[2]);
+
+        const status=
+          selisih.startsWith('+')?'is-pos':
+          selisih.startsWith('-')?'is-neg':'';
+
+        return `
           <div class="dk-rpt-table-row">
             <span>${h(r[0]||'')}</span>
-            <span>${h(r[1]||'')}</span>
-            <span>${h(r[2]||'')}</span>
-            <span class="is-pos">${h(r[3]||'')}</span>
-          </div>`).join('')}
-      </div>`;
-  }
-
+            <span>${h(r[1]||'—')}</span>
+            <span>${h(r[2]||'—')}</span>
+            <span class="${status}">${h(selisih)}</span>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+}
   
 else if(template==='trend'){
   const points=lines(s.body).slice(0,7).map(line=>{
@@ -594,6 +650,30 @@ function drawSide(){
         ?`<textarea data-f="${f}" maxlength="${d.m}" placeholder="${h(d.p)}">\n${h(s[f])}</textarea>${d.hint?`<small>${h(d.hint)}</small>`:''}`
         :`<input data-f="${f}" maxlength="${d.m}" value="${h(s[f])}" placeholder="${h(d.p)}" autocomplete="off">`}</label>`);
   });
+   
+/* INPUT TARGET MANUAL — KPI DASHBOARD */
+if(s.autoSource==='kpi'){
+  const targetRows=lines(s.body).map(line=>
+    line.split('|').map(v=>v.trim())
+  );
+
+  out.push('<div class="dk-sh">Target KPI (Manual)</div>');
+
+  targetRows.forEach((r,i)=>{
+    out.push(`
+      <label class="dk-fd">
+        <span>Target ${h(r[0]||'Indikator '+(i+1))}</span>
+        <input
+          type="text"
+          data-target-row="${i}"
+          value="${h(r[2]&&r[2]!=='—'?r[2]:'')}"
+          placeholder="Isi target manual"
+          autocomplete="off"
+        >
+      </label>
+    `);
+  });
+}
   sb.innerHTML=out.join('');
 }
 function drawAll(){
@@ -768,6 +848,34 @@ root.addEventListener('input',e=>{
  }
 
   const t=e.target;
+   
+/* SIMPAN TARGET KPI SECARA OTOMATIS */
+if(t.matches('[data-target-row]')){
+  const s=cur();
+  const index=Number(t.dataset.targetRow);
+
+  if(s.autoSource!=='kpi')return;
+
+  const rows=lines(s.body).map(line=>
+    line.split('|').map(v=>v.trim())
+  );
+
+  if(!Number.isInteger(index)||index<0||index>=rows.length)return;
+
+  while(rows[index].length<3){
+    rows[index].push('—');
+  }
+
+  const target=t.value.replace(/[|\r\n]/g,'').trim();
+  rows[index][2]=target||'—';
+
+  s.body=rows.map(r=>r.slice(0,3).join('|')).join('\n');
+
+  drawStage();
+  drawThumb(st.sel);
+  dirty();
+  return;
+}
   if(t.hasAttribute&&t.hasAttribute('data-name')){st.deck.name=clip(t.value,MAX_NAME);dirty();return}
   const f=t.dataset&&t.dataset.f;if(!f||!FIELDS[f]&&f!=='k')return;
   const s=cur();
