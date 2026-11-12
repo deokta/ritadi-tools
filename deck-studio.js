@@ -24,7 +24,6 @@ const KPI_COLORS=['#2f7bff','#8b5cf6','#14e0c4','#f59e0b'];
 const FIELDS={
   kicker:{l:'Label atas',t:'line',m:50,p:'Contoh: Monthly Operations Review'},
   title:{l:'Judul',t:'line',m:70,p:'Judul slide'},
-  subtitle:{l:'Subjudul',t:'line',m:110'},
   meta:{l:'Keterangan (periode / tanggal)',t:'line',m:50,p:'Contoh: November 2026'},
   body:{l:'Poin-poin',t:'text',m:700,p:'Tulis poin utama di sini',hint:'Satu baris = satu poin'},
   leftHead:{l:'Judul kolom kiri',t:'line',m:40,p:'Kolom kiri'},
