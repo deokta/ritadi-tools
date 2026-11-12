@@ -1628,3 +1628,226 @@
     transition:none;
   }
 }
+
+
+/* ==============================================
+   LEGUTI DECK STUDIO
+   ANIMATED EXCLUSIVE THEMES
+   Hanya untuk slide premium Joni
+   ============================================== */
+
+#view-deck .dk-rpt .dk-rpt-bg{
+  position:absolute;
+  inset:0;
+  overflow:hidden;
+  pointer-events:none;
+  z-index:0;
+  animation:none;
+}
+
+#view-deck .dk-rpt .dk-rpt-bg::before,
+#view-deck .dk-rpt .dk-rpt-bg::after{
+  content:"";
+  position:absolute;
+  inset:-20%;
+  pointer-events:none;
+  will-change:transform,opacity;
+}
+
+/* 1 — MIDNIGHT: executive glow */
+#view-deck[data-deck-theme="midnight"] .dk-rpt-bg::before{
+  background:radial-gradient(
+    ellipse at center,
+    rgba(0,225,245,.23),
+    transparent 57%
+  );
+  animation:dkMidnightGlow 9s ease-in-out infinite alternate;
+}
+
+@keyframes dkMidnightGlow{
+  from{transform:translate(-16%,-10%) scale(.85);opacity:.3}
+  to{transform:translate(19%,11%) scale(1.15);opacity:.85}
+}
+
+/* 2 — ARCTIC: crystal flow */
+#view-deck[data-deck-theme="arctic"] .dk-rpt-bg::before{
+  background:linear-gradient(
+    115deg,
+    transparent 33%,
+    rgba(255,255,255,.05) 43%,
+    rgba(255,255,255,.48) 50%,
+    rgba(255,255,255,.05) 57%,
+    transparent 67%
+  );
+  animation:dkCrystalFlow 6s ease-in-out infinite;
+}
+
+@keyframes dkCrystalFlow{
+  0%{transform:translateX(-85%);opacity:0}
+  20%{opacity:.7}
+  70%{opacity:.7}
+  100%{transform:translateX(85%);opacity:0}
+}
+
+/* 3 — AURORA: living lights */
+#view-deck[data-deck-theme="aurora"] .dk-rpt-bg::before{
+  background:
+    radial-gradient(ellipse at 28% 35%,rgba(175,48,255,.4),transparent 55%),
+    radial-gradient(ellipse at 75% 70%,rgba(19,163,255,.3),transparent 60%);
+  filter:blur(3cqw);
+  animation:dkAuroraFlow 11s ease-in-out infinite alternate;
+}
+
+#view-deck[data-deck-theme="aurora"] .dk-rpt-bg::after{
+  background:linear-gradient(
+    120deg,
+    transparent 30%,
+    rgba(183,70,255,.13) 47%,
+    rgba(17,233,255,.14) 53%,
+    transparent 70%
+  );
+  animation:dkAuroraWave 8s ease-in-out infinite alternate;
+}
+
+@keyframes dkAuroraFlow{
+  0%{transform:translate(-14%,-8%) rotate(-8deg);opacity:.4}
+  50%{transform:translate(10%,5%) rotate(7deg);opacity:.9}
+  100%{transform:translate(-4%,12%) rotate(-5deg);opacity:.6}
+}
+
+@keyframes dkAuroraWave{
+  from{transform:translateX(-18%) skewX(-9deg)}
+  to{transform:translateX(22%) skewX(9deg)}
+}
+
+/* 4 — CYBERPUNK: neon runner */
+#view-deck[data-deck-theme="cyberpunk"] .dk-rpt-bg::before{
+  background:repeating-linear-gradient(
+    120deg,
+    transparent 0 12cqw,
+    rgba(255,39,201,.20) 12cqw 12.3cqw,
+    transparent 12.3cqw 19cqw,
+    rgba(22,235,255,.18) 19cqw 19.3cqw
+  );
+  animation:dkNeonRunner 4s linear infinite;
+}
+
+#view-deck[data-deck-theme="cyberpunk"] .dk-rpt-bg::after{
+  background:linear-gradient(
+    90deg,
+    transparent 42%,
+    rgba(255,66,215,.22) 49%,
+    rgba(18,234,255,.35) 50%,
+    transparent 58%
+  );
+  animation:dkNeonScan 5s ease-in-out infinite;
+}
+
+@keyframes dkNeonRunner{
+  from{transform:translateX(-16%)}
+  to{transform:translateX(16%)}
+}
+
+@keyframes dkNeonScan{
+  0%{transform:translateX(-100%);opacity:0}
+  25%{opacity:1}
+  65%{opacity:.7}
+  100%{transform:translateX(100%);opacity:0}
+}
+
+/* 5 — QUANTUM: data grid */
+#view-deck[data-deck-theme="quantum"] .dk-rpt-bg::before{
+  inset:0;
+  background:
+    linear-gradient(rgba(24,233,171,.17) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(24,233,171,.17) 1px,transparent 1px);
+  background-size:5cqw 5cqw;
+  animation:dkQuantumGrid 8s linear infinite;
+}
+
+#view-deck[data-deck-theme="quantum"] .dk-rpt-bg::after{
+  background:linear-gradient(
+    to bottom,
+    transparent 42%,
+    rgba(23,247,169,.23) 49%,
+    rgba(49,255,206,.35) 50%,
+    transparent 58%
+  );
+  animation:dkQuantumScan 5s linear infinite;
+}
+
+@keyframes dkQuantumGrid{
+  from{background-position:0 0}
+  to{background-position:5cqw 5cqw}
+}
+
+@keyframes dkQuantumScan{
+  from{transform:translateY(-85%)}
+  to{transform:translateY(85%)}
+}
+
+/* 6 — VELOCITY: hyper motion */
+#view-deck[data-deck-theme="velocity"] .dk-rpt-bg::before{
+  background:repeating-linear-gradient(
+    115deg,
+    transparent 0 15cqw,
+    rgba(255,154,69,.25) 15cqw 16cqw,
+    transparent 16cqw 24cqw,
+    rgba(37,159,255,.20) 24cqw 24.6cqw
+  );
+  animation:dkVelocityLines 2.8s linear infinite;
+}
+
+#view-deck[data-deck-theme="velocity"] .dk-rpt-bg::after{
+  background:linear-gradient(
+    115deg,
+    transparent 37%,
+    rgba(255,155,65,.27) 48%,
+    rgba(60,174,255,.24) 52%,
+    transparent 63%
+  );
+  animation:dkVelocityFlash 3s ease-in-out infinite;
+}
+
+@keyframes dkVelocityLines{
+  from{transform:translateX(-20%)}
+  to{transform:translateX(20%)}
+}
+
+@keyframes dkVelocityFlash{
+  0%{transform:translateX(-90%);opacity:0}
+  35%{opacity:.9}
+  75%{opacity:.7}
+  100%{transform:translateX(90%);opacity:0}
+}
+
+/* Respons pada kartu metrik */
+#view-deck .dk-rpt-kpi-card{
+  transition:transform .3s ease,box-shadow .3s ease;
+}
+
+#view-deck .dk-rpt-kpi-card:hover{
+  transform:translateY(-.6cqw);
+  box-shadow:0 0 2.2cqw
+    color-mix(in srgb,var(--dk-accent) 40%,transparent);
+}
+
+/* Thumbnail: matikan animasi agar tetap ringan */
+#view-deck .dk-fr .dk-rpt-bg::before,
+#view-deck .dk-fr .dk-rpt-bg::after{
+  animation:none!important;
+  will-change:auto;
+}
+
+/* Pengguna yang memilih pengurangan gerakan */
+@media(prefers-reduced-motion:reduce){
+  #view-deck .dk-rpt-bg::before,
+  #view-deck .dk-rpt-bg::after{
+    animation:none!important;
+    will-change:auto;
+  }
+
+  #view-deck .dk-rpt-kpi-card{
+    transition:none!important;
+  }
+}
