@@ -2261,3 +2261,333 @@
     filter:none!important;
   }
 }
+
+
+/* ==========================================
+   LEGUTI CINEMATIC MOTION ENGINE V3
+   EXTENSION — GENERATED DATA SLIDES
+   Aktif untuk layout lama saat Preview/fullscreen
+   ========================================== */
+
+/* Transisi masuk untuk slide Generate Data */
+#view-deck .dk-present-motion .dk-hybrid-premium{
+  transform-origin:center center;
+  animation:dkHybridReveal .8s cubic-bezier(.16,1,.3,1) both!important;
+}
+
+@keyframes dkHybridReveal{
+  from{
+    opacity:0;
+    transform:translateY(2cqw) scale(.965);
+    filter:brightness(.65);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0) scale(1);
+    filter:brightness(1);
+  }
+}
+
+/* Judul masuk lebih dahulu */
+#view-deck .dk-present-motion
+.dk-hybrid-premium :is(.dk-hd,.dk-main,.dk-brand){
+  animation:dkHybridTitle .75s cubic-bezier(.16,1,.3,1) .15s both;
+}
+
+@keyframes dkHybridTitle{
+  from{
+    opacity:0;
+    transform:translateY(-2cqw);
+    filter:blur(5px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+    filter:blur(0);
+  }
+}
+
+/* Tabel, grafik, panel, dan kartu muncul bertahap */
+#view-deck .dk-present-motion
+.dk-hybrid-premium :is(
+  .dk-table,
+  .dk-kpis,
+  .dk-chart,
+  .dk-cols,
+  .dk-ins,
+  .dk-ul
+){
+  animation:dkHybridPanel .85s cubic-bezier(.16,1,.3,1) .28s both;
+}
+
+@keyframes dkHybridPanel{
+  from{
+    opacity:0;
+    transform:translateY(3cqw) scale(.96);
+    filter:blur(3px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0) scale(1);
+    filter:blur(0);
+  }
+}
+
+/* Baris tabel muncul satu per satu */
+#view-deck .dk-present-motion
+.dk-hybrid-premium .dk-table-row{
+  animation:dkHybridRow .55s ease-out both;
+}
+
+#view-deck .dk-present-motion
+.dk-hybrid-premium .dk-table-row:nth-child(1){
+  animation-delay:.40s;
+}
+#view-deck .dk-present-motion
+.dk-hybrid-premium .dk-table-row:nth-child(2){
+  animation-delay:.48s;
+}
+#view-deck .dk-present-motion
+.dk-hybrid-premium .dk-table-row:nth-child(3){
+  animation-delay:.56s;
+}
+#view-deck .dk-present-motion
+.dk-hybrid-premium .dk-table-row:nth-child(4){
+  animation-delay:.64s;
+}
+#view-deck .dk-present-motion
+.dk-hybrid-premium .dk-table-row:nth-child(5){
+  animation-delay:.72s;
+}
+#view-deck .dk-present-motion
+.dk-hybrid-premium .dk-table-row:nth-child(n+6){
+  animation-delay:.80s;
+}
+
+@keyframes dkHybridRow{
+  from{
+    opacity:0;
+    transform:translateX(2cqw);
+  }
+  to{
+    opacity:1;
+    transform:translateX(0);
+  }
+}
+
+/* Kartu KPI muncul bergantian */
+#view-deck .dk-present-motion
+.dk-hybrid-premium .dk-kpi{
+  animation:dkHybridRow .65s ease-out both;
+}
+
+#view-deck .dk-present-motion
+.dk-hybrid-premium .dk-kpi:nth-child(1){
+  animation-delay:.35s;
+}
+#view-deck .dk-present-motion
+.dk-hybrid-premium .dk-kpi:nth-child(2){
+  animation-delay:.47s;
+}
+#view-deck .dk-present-motion
+.dk-hybrid-premium .dk-kpi:nth-child(3){
+  animation-delay:.59s;
+}
+#view-deck .dk-present-motion
+.dk-hybrid-premium .dk-kpi:nth-child(4){
+  animation-delay:.71s;
+}
+
+/* Grafik batang tumbuh */
+#view-deck .dk-present-motion
+.dk-hybrid-premium .dk-chart-row i{
+  transform-origin:left center;
+  animation:dkHybridGrow .9s cubic-bezier(.16,1,.3,1) .45s both;
+}
+
+@keyframes dkHybridGrow{
+  from{transform:scaleX(0)}
+  to{transform:scaleX(1)}
+}
+
+/* Joni muncul dengan gerakan khas */
+#view-deck .dk-present-motion
+.dk-hybrid-premium .dk-template-joni{
+  animation:dkHybridJoni 1s cubic-bezier(.16,1,.3,1) .2s both;
+}
+
+@keyframes dkHybridJoni{
+  from{
+    opacity:0;
+    transform:translateX(5cqw) scale(.84);
+  }
+  to{
+    opacity:1;
+    transform:translateX(0) scale(1);
+  }
+}
+
+/* Lapisan efek cahaya */
+#view-deck .dk-hybrid-premium::after{
+  content:"";
+  position:absolute;
+  inset:-20%;
+  z-index:1;
+  pointer-events:none;
+  opacity:0;
+  mix-blend-mode:screen;
+}
+
+/* Pertahankan konten dan Joni di atas efek */
+#view-deck .dk-hybrid-premium :is(
+  .dk-hd,.dk-main,.dk-brand,.dk-table,
+  .dk-kpis,.dk-chart,.dk-cols,.dk-ins,.dk-ul
+){
+  z-index:2;
+}
+
+#view-deck .dk-hybrid-premium .dk-template-joni{
+  z-index:3;
+}
+
+/* MIDNIGHT — Cinematic spotlight */
+#view-deck[data-deck-theme="midnight"]
+.dk-present-motion .dk-hybrid-premium::after{
+  background:radial-gradient(
+    ellipse at 45% 48%,
+    rgba(32,187,255,.3),
+    transparent 58%
+  );
+  animation:dkHybridSpot 6s ease-in-out infinite alternate;
+}
+
+@keyframes dkHybridSpot{
+  from{opacity:.2;transform:translateX(-15%)}
+  to{opacity:.8;transform:translateX(15%)}
+}
+
+/* ARCTIC — Crystal sweep */
+#view-deck[data-deck-theme="arctic"]
+.dk-present-motion .dk-hybrid-premium::after{
+  background:linear-gradient(
+    110deg,
+    transparent 35%,
+    rgba(255,255,255,.45) 50%,
+    transparent 65%
+  );
+  animation:dkHybridSweep 4s ease-in-out infinite;
+}
+
+@keyframes dkHybridSweep{
+  0%{opacity:0;transform:translateX(-85%)}
+  30%{opacity:.65}
+  100%{opacity:0;transform:translateX(85%)}
+}
+
+/* AURORA — Liquid light */
+#view-deck[data-deck-theme="aurora"]
+.dk-present-motion .dk-hybrid-premium::after{
+  background:
+    radial-gradient(ellipse at 20% 35%,
+      rgba(174,50,255,.42),transparent 58%),
+    radial-gradient(ellipse at 75% 70%,
+      rgba(25,180,255,.3),transparent 58%);
+  filter:blur(3cqw);
+  animation:dkHybridAurora 9s ease-in-out infinite alternate;
+}
+
+@keyframes dkHybridAurora{
+  from{opacity:.35;transform:translate(-12%,-5%)}
+  to{opacity:.8;transform:translate(10%,8%)}
+}
+
+/* CYBERPUNK — Neon laser */
+#view-deck[data-deck-theme="cyberpunk"]
+.dk-present-motion .dk-hybrid-premium::after{
+  background:repeating-linear-gradient(
+    115deg,
+    transparent 0 13cqw,
+    rgba(255,35,210,.35) 13cqw 13.3cqw,
+    transparent 13.3cqw 21cqw,
+    rgba(17,234,255,.3) 21cqw 21.3cqw
+  );
+  animation:dkHybridLaser 3s linear infinite;
+}
+
+@keyframes dkHybridLaser{
+  from{opacity:.3;transform:translateX(-18%)}
+  to{opacity:.75;transform:translateX(18%)}
+}
+
+/* QUANTUM — Holographic data scan */
+#view-deck[data-deck-theme="quantum"]
+.dk-present-motion .dk-hybrid-premium::after{
+  inset:0;
+  background:
+    linear-gradient(rgba(31,242,180,.16) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(31,242,180,.16) 1px,transparent 1px),
+    linear-gradient(
+      to bottom,
+      transparent 42%,
+      rgba(41,255,198,.25) 50%,
+      transparent 58%
+    );
+  background-size:5cqw 5cqw,5cqw 5cqw,100% 100%;
+  animation:dkHybridQuantum 5s linear infinite;
+}
+
+@keyframes dkHybridQuantum{
+  from{opacity:.35;background-position:0 0,0 0,0 -40cqw}
+  to{opacity:.7;background-position:5cqw 5cqw,5cqw 5cqw,0 40cqw}
+}
+
+/* VELOCITY — Hyper-speed entry */
+#view-deck[data-deck-theme="velocity"]
+.dk-present-motion .dk-hybrid-premium{
+  animation:dkHybridSpeed .55s cubic-bezier(.16,1,.3,1) both!important;
+}
+
+#view-deck[data-deck-theme="velocity"]
+.dk-present-motion .dk-hybrid-premium::after{
+  background:repeating-linear-gradient(
+    115deg,
+    transparent 0 15cqw,
+    rgba(255,150,65,.3) 15cqw 15.7cqw,
+    transparent 15.7cqw 24cqw,
+    rgba(37,161,255,.3) 24cqw 24.6cqw
+  );
+  animation:dkHybridSpeedLines 2s linear infinite;
+}
+
+@keyframes dkHybridSpeed{
+  from{
+    opacity:0;
+    transform:translateX(7cqw) scale(1.03);
+  }
+  to{
+    opacity:1;
+    transform:translateX(0) scale(1);
+  }
+}
+
+@keyframes dkHybridSpeedLines{
+  from{opacity:.25;transform:translateX(-22%)}
+  to{opacity:.75;transform:translateX(22%)}
+}
+
+/* Thumbnail dan editor tetap statis */
+#view-deck .dk-fr .dk-hybrid-premium,
+#view-deck .dk-fr .dk-hybrid-premium *,
+#view-deck .dk-fr .dk-hybrid-premium::after{
+  animation:none!important;
+}
+
+/* Pengaturan aksesibilitas */
+@media(prefers-reduced-motion:reduce){
+  #view-deck .dk-present-motion .dk-hybrid-premium,
+  #view-deck .dk-present-motion .dk-hybrid-premium *,
+  #view-deck .dk-present-motion .dk-hybrid-premium::after{
+    animation:none!important;
+    transition:none!important;
+  }
+}
