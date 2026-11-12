@@ -11,7 +11,14 @@ if(!main||document.getElementById('view-deck'))return;
 
 /* ---------- konstanta ---------- */
 const PFX='leguti_deck_v1_',MAX_SLIDES=50,MAX_NAME=80,SAVE_MS=350;
-const THEMES={midnight:{name:'Midnight',accent:'#12e8d8'},arctic:{name:'Arctic',accent:'#2676e9'},aurora:{name:'Aurora',accent:'#b26cff'}};
+const THEMES={
+  midnight:{name:'Midnight',accent:'#12e8d8'},
+  arctic:{name:'Arctic',accent:'#2676e9'},
+  aurora:{name:'Aurora',accent:'#b26cff'},
+  cyberpunk:{name:'Cyberpunk',accent:'#ff49dc'},
+  quantum:{name:'Quantum',accent:'#19e8a5'},
+  velocity:{name:'Velocity',accent:'#ff9648'}
+};
 const JONI_ART = {
   original: './joni/joni-original.png',
   presentasi: './joni/joni-presentasi.png',
@@ -676,8 +683,20 @@ if(s.autoSource==='kpi'){
   sb.innerHTML=out.join('');
 }
 function drawAll(){
-  q('[data-name]').value=st.deck.name;root.style.setProperty('--dk-accent',st.deck.accent||'#12e8d8');
-  drawList();drawStage();drawSide();
+  q('[data-name]').value=st.deck.name;
+
+  const theme=THEMES[st.deck.theme]
+    ?st.deck.theme:'midnight';
+
+  const accent=st.deck.accent||THEMES[theme].accent;
+
+  root.dataset.deckTheme=theme;
+  root.style.setProperty('--dk-accent',accent);
+  root.style.setProperty('--dk-glow',accent);
+
+  drawList();
+  drawStage();
+  drawSide();
 }
 
 /* ---------- aksi ---------- */
