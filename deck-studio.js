@@ -12,6 +12,13 @@ if(!main||document.getElementById('view-deck'))return;
 /* ---------- konstanta ---------- */
 const PFX='leguti_deck_v1_',MAX_SLIDES=50,MAX_NAME=80,SAVE_MS=350;
 const THEMES={midnight:{name:'Midnight',accent:'#12e8d8'},arctic:{name:'Arctic',accent:'#2676e9'},aurora:{name:'Aurora',accent:'#b26cff'}};
+const JONI_ART = {
+  original: './joni/joni-original.png',
+  presentasi: './joni/joni-presentasi.png',
+  grafik: './joni/joni-grafik.png',
+  analisis: './joni/joni-analisis.png',
+  rekomendasi: './joni/joni-rekomendasi.png'
+};
 const PALETTE=['#12e8d8','#148ab9','#457af8','#8b5cf6','#e6489c','#ff9952'];
 const KPI_COLORS=['#2f7bff','#8b5cf6','#14e0c4','#f59e0b'];
 const FIELDS={
@@ -101,6 +108,9 @@ let selectedObject=null;
 function cleanSlide(o){
   const s=emptySlide(LAYOUTS[o&&o.layout]?o.layout:'content');
   if(!o||typeof o!=='object')return s;
+  if (typeof o.joni === 'string' && Object.hasOwn(JONI_ART, o.joni)) {
+  s.joni = o.joni;
+}
   if(typeof o.id==='string'&&o.id)s.id=o.id.slice(0,24);
   if(typeof o.coverImage==='string' && /^data:image\/(?:jpeg|png);base64,/.test(o.coverImage) && o.coverImage.length<1400000)s.coverImage=o.coverImage;
   Object.keys(FIELDS).forEach(f=>{s[f]=clip(o[f],FIELDS[f].m)});
@@ -118,7 +128,13 @@ function sampleDeck(){
   const d=emptySlide('chart');Object.assign(d,{title:'Tren Operasional',body:'Senin: 1200\nSelasa: 1600\nRabu: 1450\nKamis: 2100\nJumat: 1850'});
   const e=emptySlide('insight');Object.assign(e,{title:'Joni AI Insight',insight:'Prioritaskan penyelesaian kendala manifest dan produktivitas.',body:'Evaluasi lane dengan backlog tertinggi\nOptimalkan alokasi petugas\nPantau tren harian'});
   const f=emptySlide('content');Object.assign(f,{title:'Action Plan',body:'Monitoring performa setiap shift\nReview hasil operasional mingguan\nTindak lanjut anomali data'});
-  return{name:'Presentasi Operasional',slides:[a,b,c,d,e,f],theme:'midnight',accent:'#12e8d8',background:'solid',syncBase:{}};
+a.joni = 'original';
+b.joni = 'presentasi';
+c.joni = 'analisis';
+d.joni = 'grafik';
+e.joni = 'analisis';
+f.joni = 'rekomendasi';
+   return{name:'Presentasi Operasional',slides:[a,b,c,d,e,f],theme:'midnight',accent:'#12e8d8',background:'solid',syncBase:{}};
 }
 function load(k){
   try{
@@ -194,7 +210,14 @@ function slideHTML(s,n,edit){
     default:
       b=`<div class="dk-hd">${T('title','dk-ti')}</div>${UL('body')}${foot}`;
   }
-  return`<div class="dk-s dk-L-${LAYOUTS[s.layout]?s.layout:'content'} dk-template-${Math.min(n,6)}${edit?' dk-e':''}">${b}${objectHTML(s,edit)}</div>`;
+const joniImage = JONI_ART[s.joni]
+  ? `<img class="dk-template-joni"
+       src="${JONI_ART[s.joni]}"
+       alt=""
+       draggable="false">`
+  : '';
+
+return `<div class="dk-s dk-L-${LAYOUTS[s.layout]?s.layout:'content'} dk-template-${Math.min(n,6)}${s.joni?' dk-has-joni':''}${edit?' dk-e':''}">${b}${joniImage}${objectHTML(s,edit)}</div>`;
 }
 
 /* ---------- kerangka DOM ---------- */
