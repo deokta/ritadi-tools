@@ -82,8 +82,23 @@ const say=t=>{try{typeof toast==='function'&&toast(t)}catch(_){}};
 
 /* ---------- model ---------- */
 const emptySlide=layout=>({
-  id:rid(),layout,coverImage:'',kicker:'',title:'',subtitle:'',meta:'',body:'',leftHead:'',left:'',rightHead:'',right:'',insight:'',
-  objects:[],k:[{v:'',l:''},{v:'',l:''},{v:'',l:''},{v:'',l:''}]
+  id:rid(),
+  layout,
+  coverImage:'',
+  joni:'',
+  autoSource:'',
+  kicker:'',
+  title:'',
+  subtitle:'',
+  meta:'',
+  body:'',
+  leftHead:'',
+  left:'',
+  rightHead:'',
+  right:'',
+  insight:'',
+  objects:[],
+  k:[{v:'',l:''},{v:'',l:''},{v:'',l:''},{v:'',l:''}]
 });
 const DK_ICONS={star:'★',check:'✓',warning:'⚠',target:'◎',truck:'🚚',package:'▣',chart:'▥',clock:'◷',person:'♟',arrow:'➜',heart:'♥',bolt:'ϟ'};
 function cleanObject(o){
@@ -113,6 +128,8 @@ function cleanSlide(o){
 }
   if(typeof o.id==='string'&&o.id)s.id=o.id.slice(0,24);
   if(typeof o.coverImage==='string' && /^data:image\/(?:jpeg|png);base64,/.test(o.coverImage) && o.coverImage.length<1400000)s.coverImage=o.coverImage;
+  if(typeof o.joni==='string')s.joni=clip(o.joni,30);
+if(typeof o.autoSource==='string')s.autoSource=clip(o.autoSource,50);
   Object.keys(FIELDS).forEach(f=>{s[f]=clip(o[f],FIELDS[f].m)});
   if(Array.isArray(o.k))s.k=s.k.map((_,i)=>({v:clip(o.k[i]&&o.k[i].v,9),l:clip(o.k[i]&&o.k[i].l,40)}));
   if(Array.isArray(o.objects))s.objects=o.objects.slice(0,35).map(cleanObject).filter(Boolean);
@@ -120,21 +137,95 @@ function cleanSlide(o){
   return s;
 }
 function sampleDeck(){
-  const mo=new Date().toLocaleDateString('id-ID',{month:'long',year:'numeric'});
-  const a=emptySlide('title');Object.assign(a,{kicker:'Monthly Operations Review',title:'Outbound Performance Report',subtitle:'Intelligence-driven operational reporting',meta:mo});
-  const b=emptySlide('content');Object.assign(b,{title:'Executive Summary',body:'Overview operasional\nCapaian utama\nTantangan & risiko\nPrioritas tindak lanjut'});
-  const c=emptySlide('kpi');Object.assign(c,{title:'KPI Performance',subtitle:'Data KPI dapat diedit atau diisi dari laporan operasional.',
-    k:[{v:'—',l:'Total AWB'},{v:'—',l:'Selesai'},{v:'—',l:'Pencapaian'},{v:'—',l:'Belum selesai'}]});
-  const d=emptySlide('chart');Object.assign(d,{title:'Tren Operasional',body:'Senin: 1200\nSelasa: 1600\nRabu: 1450\nKamis: 2100\nJumat: 1850'});
-  const e=emptySlide('insight');Object.assign(e,{title:'Joni AI Insight',insight:'Prioritaskan penyelesaian kendala manifest dan produktivitas.',body:'Evaluasi lane dengan backlog tertinggi\nOptimalkan alokasi petugas\nPantau tren harian'});
-  const f=emptySlide('content');Object.assign(f,{title:'Action Plan',body:'Monitoring performa setiap shift\nReview hasil operasional mingguan\nTindak lanjut anomali data'});
-a.joni = 'original';
-b.joni = 'presentasi';
-c.joni = 'analisis';
-d.joni = 'grafik';
-e.joni = 'analisis';
-f.joni = 'rekomendasi';
-   return{name:'Presentasi Operasional',slides:[a,b,c,d,e,f],theme:'midnight',accent:'#12e8d8',background:'solid',syncBase:{}};
+function sampleDeck(){
+  const a=emptySlide('title');
+  Object.assign(a,{
+    autoSource:'cover',
+    joni:'cover',
+    kicker:'MONTHLY OPERATIONS REVIEW',
+    title:'Outbound Performance Report',
+    subtitle:'Intelligence-driven operational reporting',
+    meta:'November 2026'
+  });
+
+  const b=emptySlide('kpi');
+  Object.assign(b,{
+    autoSource:'summary',
+    joni:'summary',
+    title:'Executive Summary',
+    subtitle:'Ringkasan utama performa outbound pada periode November 2026.',
+    k:[
+      {v:'1.494.320',l:'Total AWB|+12,6%'},
+      {v:'1.435.980',l:'PS8|+13,1%'},
+      {v:'96,1%',l:'Akurasi|+0,8 p.p.'},
+      {v:'1.423.560',l:'Keylogger (PDT)|+11,9%'}
+    ]
+  });
+
+  const c=emptySlide('table');
+  Object.assign(c,{
+    autoSource:'kpi',
+    joni:'kpi',
+    title:'KPI Performance',
+    subtitle:'Capaian utama operasional outbound.',
+    body:[
+      'Total AWB|1.494.320|1.400.000|+6,7%',
+      'PS8 (Lolos Manifest)|1.435.980|1.350.000|+6,4%',
+      'Keylogger (PDT)|1.423.560|1.330.000|+7,0%',
+      'Akurasi Manifest|96,1%|95,0%|+1,1 p.p.'
+    ].join('\n')
+  });
+
+  const d=emptySlide('chart');
+  Object.assign(d,{
+    autoSource:'trend',
+    joni:'trend',
+    title:'Tren Operasional',
+    subtitle:'Perkembangan volume AWB dan PS8 (Lolos Manifest).',
+    body:[
+      'Minggu 1|130|115',
+      'Minggu 2|150|135',
+      'Minggu 3|160|148',
+      'Minggu 4|190|172'
+    ].join('\n')
+  });
+
+  const e=emptySlide('table');
+  Object.assign(e,{
+    autoSource:'line',
+    joni:'line',
+    title:'Analisis per LINE',
+    subtitle:'Kontribusi volume AWB berdasarkan LINE tujuan.',
+    body:[
+      'JAKARTA|412.560|27,6%',
+      'SUMATRA|318.740|21,3%',
+      'BDBCBDO|276.420|18,5%',
+      'JAWA|213.880|14,3%',
+      'LAINNYA|274.720|18,3%'
+    ].join('\n')
+  });
+
+  const f=emptySlide('insight');
+  Object.assign(f,{
+    autoSource:'insight',
+    joni:'insight',
+    title:'Insight & Rekomendasi',
+    insight:'Performa outbound meningkat signifikan, dengan akurasi manifest mencapai 96,1%.',
+    body:[
+      'Pertahankan disiplin input manifest di semua LINE.',
+      'Perkuat monitoring keylogger (PDT) harian.',
+      'Fokus peningkatan LINE dengan kontribusi di bawah target.'
+    ].join('\n')
+  });
+
+  return{
+    name:'Outbound Performance Report',
+    slides:[a,b,c,d,e,f],
+    theme:'midnight',
+    accent:'#14e0c4',
+    background:'gradient',
+    syncBase:{}
+  };
 }
 function load(k){
   try{
@@ -804,3 +895,202 @@ window.LEGUTI_DECK={get:()=>JSON.parse(JSON.stringify(st.deck))};
 // Bila menu sudah tergambar sebelum modul ini dimuat, gambar ulang agar item baru muncul.
 setTimeout(()=>{if(!document.querySelector('#nav [data-v="deck"]'))chrome()},0);
 })();
+
+/* ===== JONI REPORT TEMPLATE OVERRIDE ===== */
+.dk-rpt{
+  color:#eef6ff;
+  background:
+    radial-gradient(65cqw 40cqw at 100% 0%, #143b9d 0, transparent 70%),
+    radial-gradient(50cqw 38cqw at 0% 100%, #291d8f 0, transparent 70%),
+    linear-gradient(135deg,#04112e 0%,#071c4f 45%,#06153a 100%);
+}
+.dk-rpt-bg{
+  position:absolute; inset:0;
+  background:
+    linear-gradient(120deg, transparent 0 62%, rgba(0,220,255,.08) 62% 70%, transparent 70%),
+    linear-gradient(140deg, rgba(0,255,240,.08), transparent 26%);
+}
+.dk-rpt-cover-photo{
+  position:absolute; right:0; top:0; bottom:0; width:47%;
+  background-size:cover; background-position:center;
+  opacity:.28; filter:saturate(1.05);
+  clip-path:polygon(16% 0,100% 0,100% 100%,0 100%);
+}
+.dk-rpt-brand{
+  position:absolute; left:3.2cqw; top:2.1cqw;
+  display:flex; align-items:center; gap:1.1cqw;
+}
+.dk-rpt-brand .dk-lg{width:9.2cqw}
+.dk-rpt-brand-text b{display:block;font-size:1.9cqw;font-weight:800;line-height:1}
+.dk-rpt-brand-text span{display:block;font-size:1.1cqw;color:#d3e3ff}
+.dk-rpt-foot{
+  position:absolute; right:2.2cqw; bottom:1.6cqw;
+  font-size:1cqw; color:#9bb4da; font-weight:700;
+}
+.dk-rpt-kicker{
+  font-size:1.6cqw; font-weight:800; letter-spacing:.12em;
+  color:#24f0db; text-transform:uppercase; margin-bottom:1.2cqw;
+}
+.dk-rpt-cover-left{
+  position:absolute; left:3.5cqw; top:9.2cqw; width:42%;
+}
+.dk-rpt-cover-title{
+  font-size:5.1cqw; line-height:1.02; font-weight:900; letter-spacing:-.03em;
+  text-shadow:0 0 1.6cqw rgba(47,123,255,.28);
+}
+.dk-rpt-cover-sub{
+  margin-top:1.3cqw; font-size:1.85cqw; line-height:1.35; color:#d8e6ff;
+  max-width:90%;
+}
+.dk-rpt-meta-wrap{margin-top:1.4cqw}
+.dk-rpt-meta{
+  display:inline-flex; align-items:center; gap:.7cqw;
+  padding:.55cqw 1cqw; border-radius:999px;
+  border:.12cqw solid rgba(88,210,255,.45);
+  background:rgba(6,21,58,.55); font-size:1.3cqw;
+}
+.dk-rpt-cover-joni{
+  position:absolute; right:2.8cqw; bottom:0; width:38%;
+  display:flex; align-items:flex-end; justify-content:center;
+}
+.dk-template-joni{
+  display:block; max-width:100%; max-height:100%;
+  object-fit:contain; filter:drop-shadow(0 0 1.6cqw rgba(0,255,255,.28));
+}
+.dk-rpt-header{
+  position:absolute; left:3cqw; top:2.1cqw; right:3cqw;
+}
+.dk-rpt-h1{
+  font-size:3.2cqw; font-weight:900; line-height:1.05;
+  text-shadow:0 0 1.4cqw rgba(47,123,255,.25);
+}
+.dk-rpt-desc{
+  margin-top:.9cqw; font-size:1.45cqw; line-height:1.35; color:#dbe7ff;
+  max-width:52%;
+}
+.dk-rpt-summary-joni{
+  position:absolute; left:2.4cqw; bottom:0; width:28%;
+}
+.dk-rpt-summary-cards{
+  position:absolute; right:2.6cqw; top:8.2cqw; width:52%;
+  display:grid; grid-template-columns:repeat(4,1fr); gap:1.1cqw;
+}
+.dk-rpt-kpi-card{
+  min-height:15cqw; padding:1.2cqw .9cqw;
+  border-radius:1.15cqw;
+  border:.14cqw solid rgba(76,206,255,.55);
+  background:linear-gradient(180deg, rgba(12,44,104,.92), rgba(8,21,57,.94));
+  box-shadow:0 0 1.6cqw rgba(38,143,255,.18);
+  display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;
+}
+.dk-rpt-kpi-value{font-size:2.25cqw;font-weight:900;line-height:1.05}
+.dk-rpt-kpi-label{margin-top:.7cqw;font-size:1.15cqw;font-weight:700;line-height:1.2}
+.dk-rpt-kpi-delta{margin-top:.55cqw;font-size:1.05cqw;color:#2df0c5;font-weight:700}
+.dk-rpt-side-joni.left{
+  position:absolute; left:1.2cqw; bottom:0; width:24%;
+}
+.dk-rpt-side-joni.right{
+  position:absolute; right:1.2cqw; bottom:0; width:22%;
+}
+.dk-rpt-table-card,
+.dk-rpt-chart-card,
+.dk-rpt-line-card,
+.dk-rpt-insight-grid{
+  position:absolute;
+  border:.13cqw solid rgba(78,192,255,.45);
+  background:linear-gradient(180deg, rgba(8,31,82,.92), rgba(6,21,58,.95));
+  border-radius:1.3cqw;
+  box-shadow:0 0 1.6cqw rgba(47,123,255,.16);
+}
+.dk-rpt-table-card{
+  left:23%; right:3%; top:9.8cqw; bottom:3.2cqw;
+  padding:1.4cqw 1.5cqw;
+}
+.dk-rpt-table-head,
+.dk-rpt-table-row{
+  display:grid; grid-template-columns:2.3fr 1fr 1fr .8fr; gap:1cqw; align-items:center;
+}
+.dk-rpt-table-head{
+  padding:.85cqw 1cqw; border-radius:.9cqw;
+  background:rgba(37,75,166,.35); font-size:1.2cqw; font-weight:800;
+}
+.dk-rpt-table-row{
+  padding:.85cqw 1cqw; font-size:1.15cqw; border-bottom:.08cqw solid rgba(255,255,255,.08);
+}
+.dk-rpt-table-row .is-pos{color:#35efc3;font-weight:800}
+.dk-rpt-chart-card{
+  left:3%; right:25%; top:10.2cqw; bottom:4cqw; padding:1.4cqw;
+}
+.dk-rpt-chart-gridline{
+  position:absolute; left:1.4cqw; right:1.4cqw; height:.08cqw; background:rgba(255,255,255,.10);
+}
+.dk-rpt-chart-gridline.g1{top:28%}
+.dk-rpt-chart-gridline.g2{top:50%}
+.dk-rpt-chart-gridline.g3{top:72%}
+.dk-rpt-chart-bars{
+  position:absolute; left:1.6cqw; right:1.6cqw; bottom:2.6cqw; top:1.8cqw;
+  display:grid; grid-template-columns:repeat(4,1fr); gap:1.3cqw; align-items:end;
+}
+.dk-rpt-chart-col{
+  display:grid; grid-template-columns:1fr 1fr; align-items:end; gap:.38cqw; height:100%; position:relative;
+}
+.dk-rpt-chart-col span{
+  grid-column:1 / -1; text-align:center; font-size:1cqw; margin-top:.6cqw; color:#dce7ff;
+}
+.dk-rpt-bar{
+  align-self:end; border-radius:.45cqw .45cqw 0 0;
+}
+.dk-rpt-bar.awb{background:linear-gradient(180deg,#58a8ff,#2e6fff)}
+.dk-rpt-bar.ps8{background:linear-gradient(180deg,#40f0d7,#14c7c8)}
+.dk-rpt-chart-legend{
+  position:absolute; left:1.5cqw; bottom:.9cqw; display:flex; gap:.55cqw 1cqw; align-items:center; flex-wrap:wrap;
+  font-size:.95cqw; color:#dce7ff;
+}
+.dk-rpt-chart-legend i{width:1.2cqw;height:.55cqw;border-radius:.2cqw;display:inline-block}
+.dk-rpt-chart-legend i.awb{background:#3e87ff}
+.dk-rpt-chart-legend i.ps8{background:#1dd9cf}
+.dk-rpt-line-card{
+  left:23%; right:3%; top:10.2cqw; bottom:3.4cqw; padding:1.3cqw 1.5cqw;
+}
+.dk-rpt-line-head{
+  display:grid; grid-template-columns:1.4fr 2fr .9fr .8fr; gap:1cqw;
+  padding:.75cqw 1cqw; border-radius:.9cqw; background:rgba(37,75,166,.35);
+  font-size:1.15cqw; font-weight:800;
+}
+.dk-rpt-line-row{
+  display:grid; grid-template-columns:1.4fr 2fr .9fr .8fr; gap:1cqw; align-items:center;
+  padding:.85cqw 1cqw; font-size:1.1cqw;
+}
+.dk-rpt-line-name{font-weight:800}
+.dk-rpt-line-bar-wrap{
+  height:.9cqw; border-radius:999px; background:rgba(255,255,255,.08); overflow:hidden;
+}
+.dk-rpt-line-bar{
+  display:block; height:100%; border-radius:999px;
+  background:linear-gradient(90deg,#23f0dd,#4b87ff);
+}
+.dk-rpt-line-val,.dk-rpt-line-pct{font-weight:700}
+.dk-rpt-insight-joni{
+  position:absolute; left:2.3cqw; bottom:0; width:25%;
+}
+.dk-rpt-insight-grid{
+  left:29%; right:3%; top:10cqw; bottom:3.4cqw;
+  padding:1.2cqw; display:grid; gap:1cqw; align-content:start;
+}
+.dk-rpt-insight-box,
+.dk-rpt-rekom-box{
+  border:.12cqw solid rgba(100,207,255,.35);
+  background:rgba(7,19,55,.52); border-radius:1cqw; padding:1.2cqw 1.3cqw;
+}
+.dk-rpt-insight-box b,
+.dk-rpt-rekom-box b{
+  display:block; margin-bottom:.8cqw; font-size:1.45cqw; font-weight:900;
+}
+.dk-rpt-insight-text{font-size:1.15cqw;line-height:1.45;color:#e8f1ff}
+.dk-rpt-bullets{list-style:none;padding:0;margin:0}
+.dk-rpt-bullets li{
+  position:relative; padding-left:1.25cqw; margin:.5cqw 0; font-size:1.1cqw; line-height:1.4;
+}
+.dk-rpt-bullets li:before{
+  content:"•"; position:absolute; left:0; top:0; color:#28efd8; font-weight:900;
+}
