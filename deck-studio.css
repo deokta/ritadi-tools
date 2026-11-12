@@ -1124,3 +1124,153 @@
   font-size:1.35cqw;
   line-height:1.35;
 }
+
+
+/* PREMIUM HYBRID — KHUSUS SLIDE GENERATE DATA */
+
+#view-deck .dk-hybrid-premium{
+  background:
+    radial-gradient(55cqw 40cqw at 100% 0%,#1245a2 0%,transparent 75%),
+    radial-gradient(45cqw 40cqw at 0% 110%,#352184 0%,transparent 75%),
+    linear-gradient(125deg,#030b27,#082052 65%,#071438);
+  isolation:isolate;
+}
+
+#view-deck .dk-hybrid-premium:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(115deg,transparent 70%,rgba(0,226,255,.12) 70% 75%,transparent 76%);
+  pointer-events:none;
+  z-index:0;
+}
+
+#view-deck .dk-hybrid-premium .dk-template-joni{
+  position:absolute;
+  width:29%;
+  height:79%;
+  right:0;
+  bottom:0;
+  object-fit:contain;
+  object-position:center bottom;
+  max-width:none;
+  max-height:none;
+  z-index:2;
+  pointer-events:none;
+  filter:drop-shadow(0 0 1.8cqw rgba(0,220,255,.25));
+}
+
+/* Cover: Joni besar di sebelah kanan */
+#view-deck .dk-hybrid-premium.dk-L-title .dk-template-joni{
+  width:47%;
+  height:95%;
+  right:0;
+  bottom:0;
+}
+
+#view-deck .dk-hybrid-premium.dk-L-title .dk-main{
+  width:49%;
+  z-index:3;
+}
+
+#view-deck .dk-hybrid-premium.dk-L-title .dk-ti{
+  font-size:5.4cqw;
+  line-height:1.06;
+}
+
+/* Header slide */
+#view-deck .dk-hybrid-premium .dk-hd{
+  z-index:3;
+  right:5cqw;
+}
+
+#view-deck .dk-hybrid-premium .dk-hd .dk-ti{
+  font-size:3.8cqw;
+  font-weight:850;
+}
+
+/* Slide ringkasan */
+#view-deck .dk-hybrid-premium.dk-L-content .dk-ul{
+  right:29%;
+  z-index:3;
+  font-size:1.9cqw;
+}
+
+/* KPI cards */
+#view-deck .dk-hybrid-premium.dk-L-kpi .dk-kpis{
+  right:28%;
+  top:20cqw;
+  z-index:3;
+  gap:1cqw;
+}
+
+#view-deck .dk-hybrid-premium.dk-L-kpi .dk-kpi{
+  min-height:17cqw;
+  padding:1.4cqw;
+  background:linear-gradient(145deg,#0d347b,#071638);
+  border-radius:1.5cqw;
+  box-shadow:0 0 1.4cqw rgba(0,210,255,.15);
+}
+
+#view-deck .dk-hybrid-premium.dk-L-kpi .dk-kv{
+  font-size:2.4cqw;
+  overflow-wrap:anywhere;
+}
+
+#view-deck .dk-hybrid-premium.dk-L-kpi .dk-kl{
+  font-size:1.2cqw;
+}
+
+#view-deck .dk-hybrid-premium.dk-L-kpi .dk-sub{
+  right:29%;
+}
+
+/* Grafik: Joni di kanan */
+#view-deck .dk-hybrid-premium.dk-L-chart .dk-chart{
+  right:30%;
+  z-index:3;
+  padding:2cqw;
+  border:.14cqw solid #168cdd;
+  border-radius:1.5cqw;
+  background:rgba(6,28,72,.72);
+}
+
+/* Tabel: Joni di kiri */
+#view-deck .dk-hybrid-premium.dk-L-table .dk-template-joni{
+  left:0;
+  right:auto;
+  width:30%;
+  height:83%;
+}
+
+#view-deck .dk-hybrid-premium.dk-L-table .dk-table{
+  left:31%;
+  right:3%;
+  z-index:3;
+  border:.14cqw solid #168cdd;
+  border-radius:1.5cqw;
+  overflow:hidden;
+  background:rgba(6,28,72,.82);
+}
+
+/* Insight */
+#view-deck .dk-hybrid-premium.dk-L-insight .dk-template-joni{
+  left:0;
+  right:auto;
+  width:30%;
+  height:83%;
+}
+
+#view-deck .dk-hybrid-premium.dk-L-insight .dk-ins{
+  left:32%;
+  right:4%;
+  z-index:3;
+  font-size:2.2cqw;
+}
+
+#view-deck .dk-hybrid-premium.dk-L-insight .dk-ul{
+  left:33%;
+  right:5%;
+  z-index:3;
+  font-size:1.75cqw;
+}
