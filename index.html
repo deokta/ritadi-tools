@@ -265,12 +265,13 @@ body.ai-on .art,body.ai-on .ttl{display:none}
   }
 }
 
-/* Grafik dashboard bisa digeser horizontal */
+/* Grafik dashboard: tetap dalam panel dan bisa swipe */
 #c1, #c2 {
+  display: block;
   width: 100%;
   min-width: 0;
   max-width: 100%;
-  overflow-x: auto;
+  overflow-x: auto !important;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   touch-action: pan-x;
@@ -283,58 +284,43 @@ body.ai-on .art,body.ai-on .ttl{display:none}
   display: none;
 }
 
-/* Grafik mengikuti jumlah tanggal */
+/* Grafik memanjang sesuai jumlah tanggal */
 #c1 .plot,
 #c2 .plot {
-  width: max-content;
+  width: max-content !important;
   min-width: 100%;
-  max-width: none;
+  max-width: none !important;
 }
 
+/* Kolom tanggal tersusun horizontal */
 #c1 .cols,
 #c2 .cols {
   display: flex;
-  min-width: 0;
   width: 100%;
+  min-width: 0;
 }
 
+/* Lebar setiap tanggal */
 #c1 .col,
 #c2 .col {
-  flex: 1 0 54px;
-  min-width: 54px;
+  flex: 0 0 54px !important;
+  min-width: 54px !important;
 }
-/* Landscape: grafik tetap bisa di-swipe */
+
+/* Portrait dan landscape tetap mengikuti layar */
+#dash,
+#dash .row,
+#dash .panel {
+  min-width: 0;
+  max-width: 100%;
+}
+
 @media (orientation: landscape) {
-
-  #c1,
-  #c2 {
-    width: 100%;
-    max-width: 100%;
-    overflow-x: auto !important;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    touch-action: pan-x;
-  }
-
-  #c1 .plot,
-  #c2 .plot {
-    width: max-content !important;
-    min-width: 100%;
-    max-width: none !important;
-  }
-
-  #c1 .cols,
-  #c2 .cols {
-    width: 100% !important;
-    min-width: 0;
-  }
-
   #c1 .col,
   #c2 .col {
-    flex: 1 0 64px !important;
+    flex-basis: 64px !important;
     min-width: 64px !important;
   }
-
 }
 </style>
 </head>
