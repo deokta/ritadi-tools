@@ -248,6 +248,7 @@ body.ai-on .art,body.ai-on .ttl{display:none}
  
 <style>
 /* Scroll horizontal grafik dashboard */
+/* Grafik dashboard: swipe horizontal */
 #c1, #c2 {
   width: 100%;
   min-width: 0;
@@ -255,13 +256,31 @@ body.ai-on .art,body.ai-on .ttl{display:none}
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
-  touch-action: pan-x pan-y;
   overscroll-behavior-x: contain;
+  touch-action: pan-x;
+  scrollbar-width: none;
+}
+
+#c1::-webkit-scrollbar,
+#c2::-webkit-scrollbar {
+  display: none;
 }
 
 #c1 .plot,
 #c2 .plot {
-  flex-shrink: 0;
+  min-width: 100%;
+}
+
+#c1 .cols,
+#c2 .cols {
+  width: max-content;
+  min-width: 100%;
+  display: flex;
+}
+
+#c1 .col,
+#c2 .col {
+  flex: 0 0 calc(100% / 13);
 }
 </style>
 </head>
@@ -297,7 +316,7 @@ function grp(rows,k){const m=new Map;rows.forEach(r=>{const o=m.get(r[k])||{key:
 function spark(v,c,id){if(!v.length)return"";if(v.length<2)v=[v[0],v[0]];const mx=Math.max(...v),mn=Math.min(...v),sp=mx-mn||1,p=v.map((y,i)=>[i*190/(v.length-1),38-(y-mn)/sp*30]),l=p.map(a=>a.join(",")).join(" ");return`<svg class="sp" viewBox="0 0 190 44" preserveAspectRatio="none" style="animation:fd 1s both"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="${c}" stop-opacity=".35"/><stop offset="1" stop-color="${c}" stop-opacity="0"/></linearGradient></defs><polygon points="0,44 ${l} 190,44" fill="url(#${id})"/><polyline points="${l}" fill="none" stroke="${c}" stroke-width="2.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>`}
 function chart(el,recs,keys,tipAt){if(!recs.length){el.innerHTML='<div class="emp">Belum ada data untuk periode ini</div>';return}
 const mx=Math.max(1,...recs.flatMap(r=>keys.map(k=>r[k])))*1.12,n=recs.length;
-el.innerHTML=`<div class="plot" style="min-width:${Math.max(0,n*64)}px"><div class="gl">${[0,1,2,3,4].map(i=>`<div><span>${i==4?0:cp(mx*(4-i)/4)}</span></div>`).join("")}</div><div class="cols">${recs.map((r,i)=>`<div class="col" data-i="${i}"><div class="bars">${keys.map((k,j)=>`<div class="bar ${j?"h":""}" style="height:${r[k]/mx*100}%;animation-delay:${i*.05}s"></div>`).join("")}</div><div class="lb">${r.key.slice(8)}</div></div>`).join("")}<div class="tip" hidden></div></div></div>`;
+el.innerHTML=`<div class="plot" style="min-width:${Math.max(13,n)*64}px"><div class="gl">${[0,1,2,3,4].map(i=>`<div><span>${i==4?0:cp(mx*(4-i)/4)}</span></div>`).join("")}</div><div class="cols">${recs.map((r,i)=>`<div class="col" data-i="${i}"><div class="bars">${keys.map((k,j)=>`<div class="bar ${j?"h":""}" style="height:${r[k]/mx*100}%;animation-delay:${i*.05}s"></div>`).join("")}</div><div class="lb">${r.key.slice(8)}</div></div>`).join("")}<div class="tip" hidden></div></div></div>`;
 const tip=el.querySelector(".tip"),cols=el.querySelectorAll(".col");
 const show=i=>{cols.forEach((c,j)=>c.classList.toggle("on",j==i));if(i==null){tip.hidden=true;return}const r=recs[i];tip.hidden=false;tip.textContent=keys.length>1?`AWB ${fmt(r.awb)} · ${ind} ${fmt(r.h0)}`:fmt(r[keys[0]]);tip.style.left=(i+.5)/n*100+"%";tip.style.bottom=`calc((100% - 34px) * ${Math.max(...keys.map(k=>r[k]))/mx} + 12px)`};
 const peak=recs.reduce((b,r,i)=>r[keys[0]]>recs[b][keys[0]]?i:b,0);
