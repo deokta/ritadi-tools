@@ -247,8 +247,25 @@ body.ai-on .art,body.ai-on .ttl{display:none}
 </style>
  
 <style>
-/* Scroll horizontal grafik dashboard */
-/* Grafik dashboard: swipe horizontal */
+/* Dashboard mobile responsive */
+@media (max-width: 768px) {
+  .row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .row > .panel {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .kpis {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Grafik dashboard bisa digeser horizontal */
 #c1, #c2 {
   width: 100%;
   min-width: 0;
@@ -256,8 +273,8 @@ body.ai-on .art,body.ai-on .ttl{display:none}
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior-x: contain;
   touch-action: pan-x;
+  overscroll-behavior-x: contain;
   scrollbar-width: none;
 }
 
@@ -266,21 +283,25 @@ body.ai-on .art,body.ai-on .ttl{display:none}
   display: none;
 }
 
+/* Grafik mengikuti jumlah tanggal */
 #c1 .plot,
 #c2 .plot {
+  width: max-content;
   min-width: 100%;
+  max-width: none;
 }
 
 #c1 .cols,
 #c2 .cols {
-  width: max-content;
-  min-width: 100%;
   display: flex;
+  min-width: 0;
+  width: 100%;
 }
 
 #c1 .col,
 #c2 .col {
-  flex: 0 0 calc(100% / 13);
+  flex: 1 0 54px;
+  min-width: 54px;
 }
 </style>
 </head>
