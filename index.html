@@ -303,6 +303,39 @@ body.ai-on .art,body.ai-on .ttl{display:none}
   flex: 1 0 54px;
   min-width: 54px;
 }
+/* Landscape: grafik tetap bisa di-swipe */
+@media (orientation: landscape) {
+
+  #c1,
+  #c2 {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto !important;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
+  }
+
+  #c1 .plot,
+  #c2 .plot {
+    width: max-content !important;
+    min-width: 100%;
+    max-width: none !important;
+  }
+
+  #c1 .cols,
+  #c2 .cols {
+    width: 100% !important;
+    min-width: 0;
+  }
+
+  #c1 .col,
+  #c2 .col {
+    flex: 1 0 64px !important;
+    min-width: 64px !important;
+  }
+
+}
 </style>
 </head>
 <body>
